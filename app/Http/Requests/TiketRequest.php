@@ -26,7 +26,7 @@ class TiketRequest extends FormRequest
     {
         return [
             'description' => 'required',
-            'tanggal' => 'required',
+            // 'tanggal' => 'required',
             'quantity' => 'required',
             'category' => 'required',
             'price' => 'required',
@@ -36,7 +36,7 @@ class TiketRequest extends FormRequest
     public function messages(){
         return [
             'description.required' => 'Deskripsi tidak boleh kosong',
-            'tanggal.required' => 'Silahkan tentukan masa berlaku tiket',
+            // 'tanggal.required' => 'Silahkan tentukan masa berlaku tiket',
             'quantity.required' => 'Quantity tidak boleh kosong',
             'category.required' => 'Kategori tidak boleh kosong',
             'price.required' => 'Harga tidak boleh kosong',

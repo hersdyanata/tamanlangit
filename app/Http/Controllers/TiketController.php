@@ -1,12 +1,12 @@
 <?php
-
 namespace App\Http\Controllers;
 
-use App\Models\TicketSerials;
 use Illuminate\Http\Request;
 use DB;
 use DataTables;
 use App\Models\Tickets;
+use App\Models\TicketSerials;
+use App\Models\TicketDirect;
 use App\Http\Requests\TiketRequest;
 
 class TiketController extends Controller
@@ -49,13 +49,17 @@ class TiketController extends Controller
 
                 return $btn;
             })->addColumn('a_code', function ($row){
-                return '<a href="'.route('tiket.data.detail', $row->id).'" class="tooltiped" title="Lihat Detail">'.$row->code.'</a>';
+                return '<a href="'.route('tiket.data.detail', $row->id).'" class="tooltiped" title="Lihat Detail">#'.$row->code.'</a>';
             })->rawColumns(['actions', 'a_code'])
             ->make(true);
         }
+
+        $price = TicketDirect::get();
         return view('modules.ticketing.index')
                 ->with([
-                    'title' => 'Batch Ticketing'
+                    'title' => 'Batch Ticketing',
+                    'ticket_price_parkir' => $price->where('category', 'parkir')->pluck('price')->first(),
+                    'ticket_price_kunjungan' => $price->where('category', 'kunjungan')->pluck('price')->first(),
                 ]);
     }
 
@@ -92,14 +96,14 @@ class TiketController extends Controller
      */
     public function store(TiketRequest $request)
     {
-        $tanggal = explode(' - ', $request->tanggal);
+        // $tanggal = explode(' - ', $request->tanggal);
         try {
             DB::beginTransaction();
                 $header = Tickets::create([
                     'code' => Tickets::generateUniqueCode(),
                     'description' => $request->description,
-                    'valid_from' => $tanggal[0],
-                    'valid_to' => $tanggal[1],
+                    // 'valid_from' => $tanggal[0],
+                    // 'valid_to' => $tanggal[1],
                     'quantity' => $request->quantity,
                     'category' => $request->category,
                     'status' => 'aktif',
@@ -127,6 +131,32 @@ class TiketController extends Controller
         return response()->json([
             'msg_title' => 'Berhasil',
             'msg_body' => 'Tiket baru berhasil disimpan. Nomor tiket #'.$header->code
+        ], 200);
+    }
+
+    public function store_direct(Request $request)
+    {
+        try {
+            DB::beginTransaction();
+                TicketDirect::updateOrCreate(
+                    ['category' => $request->category],
+                    [
+                        'price' => str_replace(',', '', $request->price),
+                        'created_by' => auth()->user()->id,
+                        'updated_by' => auth()->user()->id,
+                    ]);
+            DB::commit();
+        } catch (\Exception $e){
+            DB::rollback();
+            return response()->json([
+                'msg_title' => 'Gagal!',
+                'msg_body' => $e->getMessage()
+            ], 400);
+        }
+
+        return response()->json([
+            'msg_title' => 'Berhasil',
+            'msg_body' => 'Tiket '.$request->category.' berhasil disimpan.',
         ], 200);
     }
 

@@ -432,3 +432,17 @@ function sw_delete_validated_multiple_params(postUrl, csrf_pre, params, deleteUr
 function sidebar_collapsed(){
     $('.sidebar-main').addClass('sidebar-main-resized');
 }
+
+function removeDotSeparator(inputString) {
+    return inputString.replace(/\./g, '');
+}
+
+function removeComaSeparator(inputString) {
+    return inputString.replace(/\,/g, '');
+}
+
+function formatCurrency(number) {
+    return new Intl.NumberFormat('id-ID', { style: 'currency', currency: 'IDR', maximumFractionDigits: 0 }).formatToParts(number)
+                    .map(part => part.type === 'currency' ? '' : part.value)
+                    .join('');
+}

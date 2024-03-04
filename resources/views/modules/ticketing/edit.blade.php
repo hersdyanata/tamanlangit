@@ -2,7 +2,7 @@
 @section('page_resources')
     <script src="{{ asset('assets/js/moment.min.js') }}"></script>
     <script src="{{ asset('assets/js/vendor/forms/selects/select2.min.js') }}"></script>
-    <script src="{{ asset('assets/js/vendor/pickers/daterangepicker.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/vendor/pickers/daterangepicker.js') }}"></script> --}}
 @endsection
 
 @section('subtitle')
@@ -43,12 +43,12 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        {{-- <div class="row mb-3">
                             <label class="col-form-label col-lg-3">Berlaku Untuk</label>
                             <div class="col-lg-9">
                                 <input type="text" class="form-control" name="tanggal" id="tanggal" value="{{ date('Y-m-d', strtotime($data->valid_from)) . ' - ' . date('Y-m-d', strtotime($data->valid_to)) }}">
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-3">Quantity Nomor Seri</label>
@@ -156,14 +156,14 @@
 
         $('#loader').hide();
 
-        $('#tanggal').daterangepicker({
-            parentEl: '.content-inner',
-            locale: {
-                format: 'YYYY-MM-DD', // Set the date format
-                cancelLabel: 'Clear',
-            },
-            minDate: moment(),
-        });
+        // $('#tanggal').daterangepicker({
+        //     parentEl: '.content-inner',
+        //     locale: {
+        //         format: 'YYYY-MM-DD', // Set the date format
+        //         cancelLabel: 'Clear',
+        //     },
+        //     minDate: moment(),
+        // });
     });
 
     function save(){

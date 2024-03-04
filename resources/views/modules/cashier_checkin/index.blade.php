@@ -163,9 +163,9 @@
                 $('#loader').show();
             },
             success: function (s) {
-                sw_success(s);
                 divFacilities.innerHTML = null;
                 if(s.isFound == true){
+                    sw_success(s);
                     dataId.value = s.data.id;
                     transNum.textContent = '#' + s.data.trans_num;
                     transVia.textContent = ucwords(s.data.trans_via);

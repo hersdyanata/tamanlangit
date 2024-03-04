@@ -8,13 +8,16 @@ use DB;
 use DataTables;
 use App\Models\Tickets;
 use App\Http\Requests\TiketRequest;
+use App\Models\TicketSales;
+use App\Models\TicketDirect;
+use Illuminate\Support\Facades\Cache;
 
 class TiketSaleController extends Controller
 {
     public function __construct()
     {
         $this->middleware(['auth']);
-        $this->middleware(['permission:tiket-sales-list|tiket-sales-create|tiket-sales-edit|tiket-sales-delete'], ['only' => ['index', 'show']]);
+        $this->middleware(['permission:tiket-sales-list|tiket-sales-create|tiket-sales-edit|tiket-sales-delete'], ['only' => ['index', 'show', 'get_batch']]);
         $this->middleware(['permission:tiket-sales-create'], ['only' => ['create', 'store']]);
         $this->middleware(['permission:tiket-sales-edit|tiket-sales-create'], ['only' => ['edit', 'update']]);
         $this->middleware(['permission:tiket-sales-delete'], ['only' => ['destroy']]);
@@ -26,53 +29,46 @@ class TiketSaleController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Tickets::get();
+            $data = TicketSales::with(['bulk'])->orderBy('sold_date', 'desc')->get();
             return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('actions', function ($row){
                 $btn = '';
-                if(auth()->user()->can('tiket-edit')){
-                    $status = '';
-                    if($row->status == 'selesai'){
-                        $status = 'disabled';
-                    }
-                    $btn .= '<a href="'.route('tiket.data.edit', $row->id).'" class="btn '.$status.' btn-sm btn-outline-success btn-icon tooltiped" title="Edit">
-                                <i class="ph-note-pencil"></i>
-                            </a> ';
+                if(auth()->user()->can('tiket-sales-list')){
+                    $btn .= '<button type="button" class="btn btn-sm btn-outline-success btn-icon tooltiped" title="Cetak Slip" onclick="openReceipt('.$row->id.')">
+                                <i class="ph-printer"></i>
+                            </button> ';
                 }
-                                
-                if(auth()->user()->can('tiket-delete')){
+
+                if(auth()->user()->can('tiket-sales-delete')){
                     $btn .= '<button type="button" class="btn btn-sm btn-outline-danger btn-icon tooltiped" title="Hapus" onclick="preaction('.$row->id.')">
                                 <i class="ph-trash"></i>
                             </button>';
                 }
 
                 return $btn;
-            })->addColumn('a_code', function ($row){
-                return '<a href="'.route('tiket.data.detail', $row->id).'" class="tooltiped" title="Lihat Detail">'.$row->code.'</a>';
+            })->addColumn('batch_code_sn', function ($row){
+                if($row->trans_type == 'bulk'){
+                    return $row->bulk->code.'-'.$row->serial_number;
+                }else{
+                    return $row->serial_number;
+                }
             })->rawColumns(['actions', 'a_code'])
             ->make(true);
         }
         return view('modules.ticket_sales.index')
                 ->with([
-                    'title' => 'Batch Ticketing'
+                    'title' => 'Penjualan Tiket'
                 ]);
     }
 
-    public function detail(Request $request, $id)
+    public function receipt($id)
     {
-        if ($request->ajax()) {
-            $data = TicketSerials::where('ticket_id', $id)->get();
-            return DataTables::of($data)
-            ->addIndexColumn()
-            ->make(true);
-        }
-
-        $data = Tickets::findOrFail($id);
-        return view('modules.ticket_sales.detail')
+        $data = TicketSales::find($id);
+        return view('modules.ticket_sales.receipt')
                 ->with([
-                    'title' => 'Detail Tiket #'.$data->code,
-                    'data' => $data,
+                    'title' => 'Tiket '.$data->category.' #'.$data->serial_number,
+                    'data' => $data
                 ]);
     }
 
@@ -83,37 +79,90 @@ class TiketSaleController extends Controller
     {
         return view('modules.ticket_sales.create')
                 ->with([
-                    'title' => 'Buat Tiket Batch Baru'
+                    'title' => 'Penjualan Tiket Baru'
+                ]);
+    }
+
+    public function create_params($params)
+    {
+        return view('modules.ticket_sales.create_with_params')
+                ->with([
+                    'title' => 'Kasir Penjualan Tiket '.ucfirst($params),
+                    'price' => TicketDirect::where('category', $params)->pluck('price')->first(),
+                    'category' => $params
                 ]);
     }
 
     /**
      * Store a newly created resource in storage.
      */
-    public function store(TiketRequest $request)
+    public function store(Request $request)
     {
-        $tanggal = explode(' - ', $request->tanggal);
         try {
             DB::beginTransaction();
-                $header = Tickets::create([
-                    'code' => Tickets::generateUniqueCode(),
-                    'description' => $request->description,
-                    'valid_from' => $tanggal[0],
-                    'valid_to' => $tanggal[1],
-                    'quantity' => $request->quantity,
-                    'category' => $request->category,
-                    'status' => 'aktif',
-                    'price' => $request->price,
-                    'created_by' => auth()->user()->id,
-                ]);
+                $data = $request->input('data');
+                $unsold = json_decode($data['serials'], true);
+                $solds = TicketSerials::where('ticket_id', $request->batch_id)->whereNotIn('serial_number', $unsold)->get();
+                
+                $arraySold = [];
+                foreach ($solds as $sold) {
+                    $arraySold[] = [
+                        'trans_type' => 'bulk',
+                        'ticket_batch_id' => $request->batch_id,
+                        'serial_number' => $sold->serial_number,
+                        'category' => $request->category,
+                        'price' => str_replace('.', '', $request->price),
+                        'sold_date' => now(),
+                        'created_by' => auth()->user()->id,
+                    ];
 
-                for ($i = 1; $i <= $header->quantity; $i++) {
-                    TicketSerials::create([
-                        'ticket_id' => $header->id,
-                        'serial_number' => TicketSerials::generateUniqueCode($header->id),
-                        'price' => $header->price,
-                        'status' => 'aktif',
+                    $sold->status = 'sold';
+                    $sold->sold_date = now();
+                    $sold->save();
+                }
+
+                TicketSales::insert($arraySold);
+                TicketSerials::where('ticket_id', $request->batch_id)
+                            ->whereIn('serial_number', $unsold)
+                            ->update([
+                                'status' => 'expired'
+                            ]);
+
+                Tickets::where('id', $request->batch_id)->update([
+                    'status' => 'selesai',
+                    'updated_by' => auth()->user()->id,
+                ]);
+            DB::commit();
+        } catch (\Exception $e){
+            DB::rollback();
+            return response()->json([
+                'msg_title' => 'Gagal!',
+                'msg_body' => $e->getMessage()
+            ], 400);
+        }
+
+        return response()->json([
+            'msg_title' => 'Berhasil',
+            'msg_body' => 'Penjualan tiket berhasil disimpan',
+        ], 200);
+    }
+    
+    public function store_direct(Request $request)
+    {
+        $createdId = [];
+        try {
+            DB::beginTransaction();
+                for($i = 0; $i < $request->quantity; $i++){
+                    $ticketSale = TicketSales::create([
+                        'trans_type' => 'direct',
+                        'serial_number' => TicketSales::generateUniqueCode(),
+                        'category' => $request->category,
+                        'price' => str_replace(',', '', $request->price),
+                        'sold_date' => now(),
+                        'created_by' => auth()->user()->id,
                     ]);
+
+                    $createdId[] = $ticketSale->id;
                 }
             DB::commit();
         } catch (\Exception $e){
@@ -126,7 +175,8 @@ class TiketSaleController extends Controller
 
         return response()->json([
             'msg_title' => 'Berhasil',
-            'msg_body' => 'Tiket baru berhasil disimpan. Nomor tiket #'.$header->code
+            'msg_body' => 'Penjualan tiket berhasil disimpan',
+            'tickets' => $createdId
         ], 200);
     }
 
@@ -135,10 +185,16 @@ class TiketSaleController extends Controller
      */
     public function show(string $id)
     {
-        $data = Tickets::find($id);
+        $data = TicketSales::with(['bulk'])->find($id);
+
+        if ($data->trans_type == 'bulk'){
+            $label = $data->bulk->code.'-'.$data->serial_number;
+        }else{
+            $label = $data->serial_number;
+        }
         $res = [
             'msg_title' => 'Konfirmasi',
-            'msg_body' => 'Apakah Anda yakin akan menghapus tiket '.$data->code.' ?',
+            'msg_body' => 'Apakah Anda yakin akan menghapus penjualan tiket #'.$label.'? Penghapusan ini mungkin akan membuat laporan menjadi tidak akurat.',
         ];
         return response()->json($res, 200);
     }
@@ -148,12 +204,7 @@ class TiketSaleController extends Controller
      */
     public function edit(string $id)
     {
-        $data = Tickets::find($id);
-        return view('modules.ticket_sales.edit')
-                ->with([
-                    'title' => 'Edit Tiket Batch #'.$data->code,
-                    'data' => $data
-                ]);
+        // 
     }
 
     /**
@@ -161,31 +212,7 @@ class TiketSaleController extends Controller
      */
     public function update(TiketRequest $request, string $id)
     {
-        $tanggal = explode(' - ', $request->tanggal);
-        try {
-            DB::beginTransaction();
-                $data = Tickets::find($id);
-                $data->description = $request->description;
-                $data->valid_from = $tanggal[0];
-                $data->valid_to = $tanggal[1];
-                $data->category = $request->category;
-                $data->status = $request->status;
-                $data->price = $request->price;
-                $data->updated_by = auth()->user()->id;
-                $data->save();
-            DB::commit();
-        } catch (\Exception $e){
-            DB::rollback();
-            return response()->json([
-                'msg_title' => 'Gagal!',
-                'msg_body' => $e->getMessage()
-            ], 400);
-        }
-
-        return response()->json([
-            'msg_title' => 'Berhasil',
-            'msg_body' => 'Perubahan tiket #'.$data->code.' berhasil disimpan'
-        ], 200);
+        // 
     }
 
     /**
@@ -193,12 +220,11 @@ class TiketSaleController extends Controller
      */
     public function destroy(string $id)
     {
-        $data = Tickets::find($id);
+        $data = TicketSales::find($id);
         $res = [
             'msg_title' => 'Berhasil',
-            'msg_body' => 'Tiket dengan kode #'.$data->code.' telah dihapus.',
+            'msg_body' => 'Penjualan tiket dengan serial number #'.$data->serial_number.' telah dihapus.',
         ];
-        TicketSerials::where('ticket_id', $id)->delete();
         $data->delete();
         return response()->json($res,200);
     }

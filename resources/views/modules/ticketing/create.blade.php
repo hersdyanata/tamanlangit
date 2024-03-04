@@ -2,7 +2,7 @@
 @section('page_resources')
     <script src="{{ asset('assets/js/moment.min.js') }}"></script>
     <script src="{{ asset('assets/js/vendor/forms/selects/select2.min.js') }}"></script>
-    <script src="{{ asset('assets/js/vendor/pickers/daterangepicker.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/vendor/pickers/daterangepicker.js') }}"></script> --}}
 @endsection
 
 @section('subtitle')
@@ -26,7 +26,7 @@
                 </div>
 
                 <div class="card-body border-bottom border-light">
-                    <form id="form_data">
+                    <form id="form_batch">
                         @csrf
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-3">Deskripsi</label>
@@ -35,12 +35,12 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        {{-- <div class="row mb-3">
                             <label class="col-form-label col-lg-3">Berlaku Untuk</label>
                             <div class="col-lg-9">
                                 <input type="text" class="form-control" name="tanggal" id="tanggal">
                             </div>
-                        </div>
+                        </div> --}}
 
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-3">Quantity Nomor Seri</label>
@@ -64,7 +64,7 @@
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-3">Harga</label>
                             <div class="col-lg-9">
-                                <input type="text" class="form-control" name="price" id="price">
+                                <input type="text" class="form-control" name="price" id="price" autocomplete="off">
                             </div>
                         </div>
 
@@ -78,13 +78,13 @@
                                 </button>
                             </div>
                         </div>
-
-                        <div class="d-flex align-items-center">
-                            <div class="row col-lg-9 offset-3 mb-2" id="loader">
-                                <span class="fst-italic"><i class="ph-aperture spinner"></i> Loading...</span>
-                            </div>
-                        </div>
                     </form>
+
+                    <div class="d-flex align-items-center">
+                        <div class="row col-lg-9 offset-3 mb-2 loader">
+                            <span class="fst-italic"><i class="ph-aperture spinner"></i> Loading...</span>
+                        </div>
+                    </div>
                 </div>
             </div>
         </div>
@@ -135,25 +135,25 @@
             $(this).select2();
         });
 
-        $('#loader').hide();
+        $('.loader').hide();
 
-        $('#tanggal').daterangepicker({
-            parentEl: '.content-inner',
-            locale: {
-                format: 'YYYY-MM-DD', // Set the date format
-                cancelLabel: 'Clear',
-            },
-            minDate: moment(),
-        });
+        // $('#tanggal').daterangepicker({
+        //     parentEl: '.content-inner',
+        //     locale: {
+        //         format: 'YYYY-MM-DD', // Set the date format
+        //         cancelLabel: 'Clear',
+        //     },
+        //     minDate: moment(),
+        // });
     });
 
     function save(){
         $.ajax({
             type: "POST",
             url: "{{ route('tiket.data.store') }}",
-            data: $('#form_data').serialize(),
+            data: $('#form_batch').serialize(),
             beforeSend: function(){
-                $('#loader').show();
+                $('.loader').show();
                 $('#saveButton').prop('disabled', true);
             },
             success: function (s) {
@@ -166,7 +166,7 @@
                 sw_multi_error(e);
             },
             complete: function(){
-                $('#loader').hide();
+                $('.loader').hide();
                 // $('#saveButton').prop('disabled', false);
             }
         });

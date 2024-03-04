@@ -88,15 +88,14 @@ Route::name('transaksi.')->group(function () {
 
 Route::name('tiket.')->group(function () {
     Route::resource('tiket/data', App\Http\Controllers\TiketController::class);
+    Route::post('tiket/data/direct', [App\Http\Controllers\TiketController::class, 'store_direct'])->name('data.store_direct');
     Route::get('tiket/data/detail/{id}', [App\Http\Controllers\TiketController::class, 'detail'])->name('data.detail');
 
     Route::resource('tiket/terjual', App\Http\Controllers\TiketSaleController::class);
-});
-
-Route::name('parkir.')->group(function () {
-    Route::resource('parkir/data', App\Http\Controllers\ParkirDataController::class);
-    Route::resource('parkir/in', App\Http\Controllers\ParkirInController::class);
-    Route::resource('parkir/out', App\Http\Controllers\ParkirOutController::class);
+    Route::get('tiket/terjual/batch/{code}', [App\Http\Controllers\TiketSaleController::class, 'get_batch'])->name('terjual.get_batch');
+    Route::get('tiket/terjual/create/{param}', [App\Http\Controllers\TiketSaleController::class, 'create_params'])->name('terjual.create_params');
+    Route::post('tiket/terjual/store_direct', [App\Http\Controllers\TiketSaleController::class, 'store_direct'])->name('terjual.store_direct');
+    Route::get('tiket/terjual/receipt/{id}', [App\Http\Controllers\TiketSaleController::class, 'receipt'])->name('terjual.receipt');
 });
 
 Route::name('acl.')->group(function () {

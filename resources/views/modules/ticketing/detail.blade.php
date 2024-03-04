@@ -42,7 +42,7 @@
             </tr>
             <tr>
                 <td width="50%">Kode</td>
-                <td>{{ $data->code }}</td>
+                <td>#{{ $data->code }}</td>
             </tr>
             <tr>
                 <td width="50%">Deskripsi</td>
@@ -52,10 +52,10 @@
                 <td width="50%">Kategori</td>
                 <td>{{ $data->category }}</td>
             </tr>
-            <tr>
+            {{-- <tr>
                 <td width="50%">Masa Berlaku</td>
                 <td>{{ date('d.m.Y', strtotime($data->valid_from)) }} s/d {{ date('d.m.Y', strtotime($data->valid_to)) }}</td>
-            </tr>
+            </tr> --}}
             <tr>
                 <td width="50%">Quantity</td>
                 <td>{{ number_format($data->quantity) }}</td>
