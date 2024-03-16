@@ -53,7 +53,7 @@ class TransCheckinController extends Controller
                 ->where('trans_num', $id)
                 ->whereNull('cancel_flag')
                 ->whereNull('checkin_date')
-                ->whereDate('start_date', '=', now()->format('Y-m-d'))
+                // ->whereDate('start_date', '=', now()->format('Y-m-d'))
                 ->first();
 
         if(isset($data)){

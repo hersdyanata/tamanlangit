@@ -14,6 +14,7 @@ use App\Models\EventOrganizer;
 use App\Http\Requests\ReservasiOnsiteRequest;
 use Illuminate\Support\Facades\Cache;
 use App\Models\ReservedDates;
+use App\Helpers\Reservation;
 
 class TransReservasiOnsiteController extends Controller
 {
@@ -69,9 +70,11 @@ class TransReservasiOnsiteController extends Controller
             return Wahana::with(['rooms'])->get();
         });
 
-        $coupons = Cache::remember('dropdown_coupon', 300, function () {
-            return Coupons::where(['status' => 'A', 'valid_for' => 'both'])->orWhere('valid_for', 'onsite')->get();
-        });
+        // $coupons = Cache::remember('dropdown_coupon', 300, function () {
+        //     return Coupons::where(['status' => 'A', 'valid_for' => 'both'])->orWhere('valid_for', 'onsite')->get();
+        // });
+
+        $coupons = Coupons::where(['status' => 'A', 'valid_for' => 'both'])->orWhere('valid_for', 'onsite')->get();
 
         return view('modules.cashier_reservasi.create')
                 ->with([
@@ -262,25 +265,9 @@ class TransReservasiOnsiteController extends Controller
         ];        
     }
 
-    public function check_availability(Request $request)
+    public function check_availability(Reservation $reservation, Request $request)
     {
-        $tanggal = explode(' - ', $request->daterange);
-        $reserved = ReservedDates::whereBetween('date', $tanggal)->where('wahana_id', $request->wahana_id)->where('room_id', $request->room_id)->get();
-
-        $message = '';
-        foreach ($reserved as $index => $reservation){
-            $message .= '<span class="fw-semibold">#'.$reservation->trans_num. '</span>, <span class="fw-semibold text-danger">Tanggal: '.$reservation->date.'</span>';        
-            if ($index < count($reserved) - 1) {
-                $message .= '<br>';
-            }
-        }
-
-        $availability = (count($reserved) > 0) ? false : true;
-
-        return response()->json([
-            'isAvailable' => $availability,
-            'message' => $message
-        ], 200);
+        return $reservation->check_availability($request->all());
     }
 
     /**

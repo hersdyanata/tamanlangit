@@ -23,6 +23,9 @@ return new class extends Migration
             $table->string('user_choose_room', 2)->nullable();
             $table->string('room_name', 20);
             $table->integer('price');
+            $table->string('slug');
+            $table->bigInteger('created_by');
+            $table->bigInteger('updated_by')->nullable();
 
             $table->timestamps();
         });

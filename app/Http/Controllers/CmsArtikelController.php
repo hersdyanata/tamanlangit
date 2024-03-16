@@ -8,6 +8,7 @@ use App\Models\Articles;
 use App\Http\Requests\ArticleRequest;
 use DB;
 use DataTables;
+use Illuminate\Support\Str;
 
 class CmsArtikelController extends Controller
 {
@@ -87,7 +88,8 @@ class CmsArtikelController extends Controller
                     'category_id' => $request->category_id,
                     'content' => $request->content,
                     'status' => $request->status,
-                    'tags' => $request->tags,
+                    // 'tags' => $request->tags,
+                    'keywords' => $request->keywords,
                     'created_by' => auth()->user()->id,
                 ]);
             DB::commit();
@@ -144,8 +146,10 @@ class CmsArtikelController extends Controller
                 $put->category_id = $request->category_id;
                 $put->content = $request->content;
                 $put->status = $request->status;
-                $put->tags = $request->tags;
+                // $put->tags = $request->tags;
+                $put->keywords = $request->keywords;
                 $put->updated_by = auth()->user()->id;
+                $put->url = Str::slug($request->title);
                 $put->save();
             DB::commit();
         } catch (\Exception $e){

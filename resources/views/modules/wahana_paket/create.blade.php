@@ -29,7 +29,7 @@
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Nama Wahana</label>
                             <div class="col-lg-10">
-                                <input type="text" class="form-control" name="name" id="name">
+                                <input type="text" class="form-control" name="name" id="name" autocomplete="off">
                             </div>
                         </div>
 
@@ -43,30 +43,38 @@
                         </div>
 
                         <div class="row mb-3">
+                            <label class="col-form-label col-lg-2">Keywords</label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control mb-1" name="keywords" id="keywords" autocomplete="off">
+                                <span class="text-muted">Dipisahkan dengan <code>koma (,)</code> dan tanpa spasi</span>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Max. Jumlah Orang</label>
                             <div class="col-lg-10">
-                                <input type="number" class="form-control" name="max_person" id="max_person">
+                                <input type="number" class="form-control" name="max_person" id="max_person" autocomplete="off">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Luas Kamar/Tenda (m2)</label>
                             <div class="col-lg-10">
-                                <input type="number" class="form-control" name="room_wide" id="room_wide">
+                                <input type="number" class="form-control" name="room_wide" id="room_wide" autocomplete="off">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Harga /malam</label>
                             <div class="col-lg-10">
-                                <input type="text" class="form-control" name="price" id="price">
+                                <input type="text" class="form-control" name="price" id="price" autocomplete="off">
                             </div>
                         </div>
 
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Jumlah Kamar/Tenda</label>
                             <div class="col-lg-10">
-                                <input type="number" class="form-control" name="room_available" id="room_available">
+                                <input type="number" class="form-control" name="room_available" id="room_available" autocomplete="off">
                             </div>
                         </div>
 
@@ -83,7 +91,7 @@
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Nama Unik Kamar/Tenda</label>
                             <div class="col-lg-10">
-                                <input type="text" class="form-control" name="room_name" id="room_name">
+                                <input type="text" class="form-control" name="room_name" id="room_name" autocomplete="off">
                             </div>
                         </div>
 
@@ -180,7 +188,7 @@
                 sw_success_redirect(s, "{{ route('wahana.paket.index') }}");
             },
             error: function(e){
-                // sw_multi_error(e);
+                sw_multi_error(e);
                 // small_loader_close('form_data');
             },
             complete: function(){

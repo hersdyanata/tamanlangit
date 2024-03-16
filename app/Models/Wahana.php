@@ -20,7 +20,10 @@ class Wahana extends Model
         'user_choose_room',
         'room_name',
         'price',
-        'url'
+        'slug',
+        'created_by',
+        'updated_by',
+        'keywords',
     ];
 
     public function rooms(){
@@ -33,6 +36,10 @@ class Wahana extends Model
     
     public function images(){
         return $this->hasMany(WahanaImage::class, 'wahana_id', 'id');
+    }
+
+    public function creator(){
+        return $this->hasOne(User::class, 'id', 'created_by');
     }
 
     public function reservations(){

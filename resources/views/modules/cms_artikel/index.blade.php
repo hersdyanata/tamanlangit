@@ -42,7 +42,7 @@
                         <th>Kategori</th>
                         <th width="30%">Konten</th>
                         <th>Status</th>
-                        <th>Tags</th>
+                        <th>Keywords</th>
                         <th>URL</th>
                         <th>Views</th>
                         <th>Creator</th>
@@ -79,7 +79,7 @@
                 { data: 'category', name: 'category', orderable: true, searchable: true, sortable: true },
                 { data: 'content_', name: 'content_', orderable: true, searchable: true, sortable: true },
                 { data: 'status', name: 'status', orderable: true, searchable: true, sortable: true },
-                { data: 'tags', name: 'tags', orderable: true, searchable: true, sortable: true },
+                { data: 'keywords', name: 'keywords', orderable: true, searchable: true, sortable: true },
                 { data: 'url', name: 'url', orderable: true, searchable: true, sortable: true },
                 { data: 'count_views', name: 'count_views', orderable: true, searchable: true, sortable: true },
                 { data: 'creator', name: 'creator', orderable: true, searchable: true, sortable: true },

@@ -20,32 +20,57 @@
 
 <body>
 
+    {{-- <h3 style="line-height: 2px;">{{ ENV('APP_NAME') }}</h3>
+    <h4>Nomor Tiket: #{{ $data->serial_number }}</h4> --}}
+
     <table width="100%">
-        <tr>
-            <td valign="top"><img src="{{ asset('assets/images/taman_langit.png') }}" alt="" width="120" /></td>
-            <td align="right">
-                <h3>{{ ENV('APP_NAME') }}</h3>
-                <pre>
-                Kp. Puncak Mulya, Jl. Cukul, Sukaluyu,
-                Pangalengan, Kabupaten Bandung Selatan
-                Jawa Barat
-                phone: 283492348
-            </pre>
+        <tr style="line-height: 15px;">
+            <td width="20%"><img src="{{ asset('assets/images/taman_langit.png') }}" alt="" width="80px" /></td>
+            <td>
+                <h1 style="font-size: 30px;">{{ ENV('APP_NAME') }}</h1>
             </td>
         </tr>
-
     </table>
 
+    <hr>
+
     <table width="100%">
+        <tr style="line-height: 10px;">
+            <td>
+                <h3>Nomor Tiket</h3>
+                <h3>Tanggal</h3>
+            </td>
+            <td>
+                <h3>:</h3>
+                <h3>:</h3>
+            </td>
+            <td>
+                <h3>#{{ $data->serial_number }}</h3>
+                <h3>{{ date('d.m.Y H:i:s', strtotime($data->sold_date)) }}</h3>
+            </td>
+        </tr>
+    </table>
+
+    <hr>
+
+    <table width="100%">
+        <tr>
+            <td style="border: 1px solid rgba(0, 0, 0, 0.5); text-align:center;"><h2>{{ Str::upper($data->category) }}</h2></td>
+            <td width="5%"></td>
+            <td style="border: 1px solid rgba(0, 0, 0, 0.5); text-align:center;">
+                <h1>{{ number_format($data->price) }}</h1>
+            </td>
+        </tr>
+    </table>
+
+    {{-- <table width="100%">
         <tr>
             <td><strong>Tiket:</strong> #{{ $data->serial_number }}</td>
             <td align="right"><strong>Tgl:</strong> {{ date('d.m.Y H:i:s', strtotime($data->sold_date)) }}</td>
         </tr>
-    </table>
+    </table> --}}
 
-    <br />
-
-    <table width="100%">
+    {{-- <table width="100%">
         <thead style="background-color: lightgray;">
             <tr>
                 <th>Item</th>
@@ -58,7 +83,7 @@
                 <td align="center">{{ number_format($data->price) }}</td>
             </tr>
         </tbody>
-    </table>
+    </table> --}}
 
 </body>
 

@@ -48,6 +48,7 @@ class CmsController extends Controller
         $cms = Articles::find($id);
         $cms->title = $request->title;
         $cms->content = $request->content;
+        $cms->keywords = $request->keywords;
         $cms->save();
 
         return response()->json([

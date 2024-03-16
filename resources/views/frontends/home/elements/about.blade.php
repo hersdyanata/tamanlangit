@@ -5,49 +5,47 @@
             <div class="col-xl-5 mil-mb-100">
 
                 <div class="mil-text-frame">
-                    <div class="mil-suptitle mil-mb-20 mil-fade-up">About us</div>
-                    <h2 class="mil-mb-60 mil-fade-up">Why more than a million visitors chose us</h2>
+                    <div class="mil-suptitle mil-mb-20 mil-fade-up">Tentang Kami</div>
+                    <h2 class="mil-mb-60 mil-fade-up">Alasan kenapa memilih liburan di {{ ENV('APP_NAME') }}</h2>
                     <ul class="mil-about-list">
                         <li class="mil-fade-up">
                             <div class="mil-item-head">
                                 <span>01.</span>
-                                <h4>Ocean Oasis</h4>
+                                <h4>Panorama View 360°</h4>
                             </div>
-                            <p>Accusantium doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae.</p>
+                            <p>Di {{ ENV('APP_NAME') }}, sejauh mata memandang Anda akan disajikan pemandangan alam perbatasan Bandung Selatan & Garut Selatan.</p>
                         </li>
                         <li class="mil-fade-up">
                             <div class="mil-item-head">
                                 <span>02.</span>
-                                <h4>Beach Haven</h4>
+                                <h4>Ketinggian 1.670 mdpl</h4>
                             </div>
-                            <p>Doloremque laudantium, totam rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto beatae.</p>
+                            <p>Berkemah atau healing diketinggian kami tentu akan memberikan pengalaman yang tidak biasa.</p>
                         </li>
                         <li class="mil-fade-up">
                             <div class="mil-item-head">
                                 <span>03.</span>
-                                <h4>Sunset Bliss</h4>
+                                <h4>Udara Sejuk</h4>
                             </div>
-                            <p>Laudantium, totam accusantium doloremque rem aperiam eaque ipsa, quae ab illo inventore veritatis et quasi architecto.</p>
+                            <p>Nikmati udara sejuk ditemani secangkir kopi panas, dan melupakan rutinitas Anda untuk sejenak.</p>
                         </li>
                     </ul>
                 </div>
-
             </div>
             <div class="col-xl-5 mil-mb-100">
-
                 <div class="mil-illustration-1">
                     <img src="{{ asset('assets/fe/img/shapes/4.png') }}" class="mil-shape mil-fade-up" alt="shape">
                     <div class="mil-circle mil-1 mil-fade-up">
-                        <img src="{{ asset('assets/fe/img/services/1.jpg') }}" alt="img">
+                        <img src="{{ asset('assets/fe/img/images/home/spot1.jpg') }}" alt="img">
                     </div>
                     <div class="mil-circle mil-2 mil-fade-up">
-                        <img src="{{ asset('assets/fe/img/services/2.jpg') }}" alt="img">
+                        <img src="{{ asset('assets/fe/img/images/home/spot2.jpg') }}" alt="img">
                     </div>
                     <div class="mil-circle mil-3 mil-fade-up">
-                        <img src="{{ asset('assets/fe/img/services/3.jpg') }}" alt="img">
+                        <img src="{{ asset('assets/fe/img/images/home/spot3.jpg') }}" alt="img">
                     </div>
                     <div class="mil-circle mil-4 mil-fade-up">
-                        <img src="{{ asset('assets/fe/img/services/4.jpg') }}" alt="img">
+                        <img src="{{ asset('assets/fe/img/images/home/spot4.jpg') }}" alt="img">
                     </div>
                     <img src="{{ asset('assets/fe/img/shapes/1.png') }}" alt="object" class="mil-figure mil-1 mil-fade-up">
                     <img src="{{ asset('assets/fe/img/shapes/2.png') }}" alt="object" class="mil-figure mil-2 mil-fade-up">
@@ -59,7 +57,7 @@
     </div>
 </div>
 
-<div class="mil-about">
+{{-- <div class="mil-about">
     <div class="container">
         <div class="row justify-content-between align-items-center flex-sm-row-reverse">
             <div class="col-xl-5 mil-mb-100">
@@ -105,4 +103,4 @@
             </div>
         </div>
     </div>
-</div>
+</div> --}}

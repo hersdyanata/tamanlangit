@@ -1,6 +1,7 @@
 @extends('layouts.app')
 @section('page_resources')
     <script src="{{ asset('assets/js/vendor/editors/ckeditor/ckeditor_classic.js') }}"></script>
+    {{-- <script src="{{ asset('assets/js/vendor/editors/ckeditor5/build/ckeditor.js') }}"></script> --}}
     <script src="{{ asset('assets/js/vendor/forms/selects/select2.min.js') }}"></script>
 @endsection
 
@@ -25,7 +26,7 @@
                 </div>
 
                 <div class="card-body border-bottom border-light">
-                    <form id="form_data">
+                    <form id="form_data" enctype="multipart/form-data">
                         @csrf
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Judul</label>
@@ -64,10 +65,18 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        {{-- <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Tags</label>
                             <div class="col-lg-10">
                                 <input type="text" class="form-control mb-1" name="tags" id="tags">
+                                <span class="text-muted">Dipisahkan dengan <code>koma (,)</code> dan tanpa spasi</span>
+                            </div>
+                        </div> --}}
+
+                        <div class="row mb-3">
+                            <label class="col-form-label col-lg-2">Keywords</label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control mb-1" name="keywords" id="keywords">
                                 <span class="text-muted">Dipisahkan dengan <code>koma (,)</code> dan tanpa spasi</span>
                             </div>
                         </div>
@@ -111,7 +120,6 @@
                         { model: 'heading6', view: 'h6', title: 'Heading 6', class: 'ck-heading_heading6' },
                     ],
                 },
-                removePlugins: ['ImageUpload', 'ImageToolbar', 'EasyImage'],
         })
         .then(editor => {
             editor.model.document.on('change:data', () => {

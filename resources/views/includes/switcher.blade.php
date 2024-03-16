@@ -1,8 +1,8 @@
 <!-- Demo config -->
 <div class="offcanvas offcanvas-end" tabindex="-1" id="demo_config">
     <div class="position-absolute top-50 end-100 visible">
-        <button type="button" class="btn btn-yellow btn-icon translate-middle-y rounded-end-0" data-bs-toggle="offcanvas" data-bs-target="#demo_config">
-            <i class="ph-gear-six spinner"></i>
+        <button type="button" class="btn btn-icon bg-primary translate-middle-y rounded-end-0" data-bs-toggle="offcanvas" data-bs-target="#demo_config">
+            <i class="ph-gear-six text-yellow spinner"></i>
         </button>
     </div>
 

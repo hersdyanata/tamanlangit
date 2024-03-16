@@ -1,9 +1,9 @@
-<div class="mil-content-pad mil-p-100-100" style="background-image: url({{ asset('assets/fe/img/shapes/5.png') }}); background-size: 100%">
+<div class="mil-content-pad mil-mb-40 mil-p-100-100" style="background-image: url({{ asset('assets/fe/img/shapes/5.png') }}); background-size: 100%">
     <div class="container">
 
         <div class="mil-text-center">
-            <div class="mil-suptitle mil-mb-20 mil-fade-up">Reviews</div>
-            <h2 class="mil-mb-100 mil-fade-up">Customer Voices: <br>Hear What They Say!</h2>
+            <div class="mil-suptitle mil-mb-20 mil-fade-up">Ulasan</div>
+            <h2 class="mil-mb-100 mil-fade-up">Ini kata mereka!</h2>
         </div>
 
         <div class="mil-revi-pagination mil-mb-40 mil-fade-up"></div>

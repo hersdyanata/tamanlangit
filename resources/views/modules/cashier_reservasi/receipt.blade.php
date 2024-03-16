@@ -4,7 +4,6 @@
 <head>
     <meta charset="UTF-8">
     <title>{{ $title }}</title>
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/meyer-reset/2.0/reset.min.css">
     <link rel='stylesheet' href='https://fonts.googleapis.com/css?family=Roboto:100,300,400'>
     <link rel="stylesheet" href="{{ asset('assets/css/reservation_styles.css') }}">
     <link href="{{ asset('assets/icons/phosphor/styles.min.css') }}" rel="stylesheet" type="text/css">

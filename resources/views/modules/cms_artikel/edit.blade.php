@@ -30,7 +30,7 @@
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Judul</label>
                             <div class="col-lg-10">
-                                <input type="hidden" name="title" id="title" value="{{ $artikel->id }}" readonly>
+                                <input type="hidden" name="id" id="id" value="{{ $artikel->id }}" readonly>
                                 <input type="text" class="form-control" name="title" id="title" value="{{ $artikel->title }}">
                             </div>
                         </div>
@@ -65,10 +65,18 @@
                             </div>
                         </div>
 
-                        <div class="row mb-3">
+                        {{-- <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Tags</label>
                             <div class="col-lg-10">
-                                <input type="text" class="form-control mb-1" name="tags" id="tags" value="{{ $artikel->tags }}">
+                                <input type="text" class="form-control mb-1" name="tags" id="tags" value="">
+                                <span class="text-muted">Dipisahkan dengan <code>koma (,)</code> dan tanpa spasi</span>
+                            </div>
+                        </div> --}}
+
+                        <div class="row mb-3">
+                            <label class="col-form-label col-lg-2">Keywords</label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control mb-1" name="keywords" id="keywords" value="{{ $artikel->keywords }}">
                                 <span class="text-muted">Dipisahkan dengan <code>koma (,)</code> dan tanpa spasi</span>
                             </div>
                         </div>

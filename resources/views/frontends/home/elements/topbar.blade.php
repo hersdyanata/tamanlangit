@@ -10,17 +10,30 @@
             <div class="mil-mobile-menu">
                 <nav class="mil-menu">
                     <ul>
-                        <li><a href="{{ route('home') }}">Beranda</a></li>
-                        <li><a href="">Tentang Kami</a></li>
-                        <li><a href="">Kontak</a></li>
-                        <li><a href="">Blog</a></li>
-                        {{-- <li>
+                        <li class="{{ (Request::segment(1) == null) ? 'mil-current' : '' }}">
+                            <a href="{{ route('home') }}">Beranda</a>
+                        </li>
+                        <li class="{{ (Request::segment(1) == 'tentang-kami') ? 'mil-current' : '' }}">
+                            <a href="{{ route('about') }}">Tentang Kami</a>
+                        </li>
+                        <li class="{{ (Request::segment(1) == 'kontak') ? 'mil-current' : '' }}">
+                            <a href="{{ route('contact') }}">Kontak</a>
+                        </li>
+                        <li class="{{ (Request::segment(1) == 'faq') ? 'mil-current' : '' }}">
+                            <a href="{{ route('faq') }}">FAQ</a>
+                        </li>
+                        <li class="{{ (Request::segment(1) == 'paket-wisata') ? 'mil-current' : '' }}">
+                            <a href="{{ route('wahana') }}">Paket Wisata</a>
+                        </li>
+                        <li class="{{ (Request::segment(1) == 'blog') ? 'mil-current' : '' }}">
                             <a href="#.">Blog</a>
                             <ul>
-                                <li><a href="blog.html">Blog</a></li>
-                                <li><a href="publication.html">Publication</a></li>
+                                @foreach (getBlogCategories() as $category)
+                                    <li><a href="{{ route('blog_category', $category->url) }}">{{ $category->title }}</a></li>
+                                    
+                                @endforeach
                             </ul>
-                        </li> --}}
+                        </li>
                     </ul>
                 </nav>
                 <a href="#." class="mil-button mil-open-book-popup mil-top-panel-btn">

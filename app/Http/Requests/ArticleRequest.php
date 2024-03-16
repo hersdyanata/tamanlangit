@@ -32,7 +32,7 @@ class ArticleRequest extends FormRequest
             'category_id' => 'required',
             'content' => 'required',
             'status' => 'required',
-            'tags' => 'required',
+            'keywords' => 'required',
         ];
     }
 
@@ -43,7 +43,7 @@ class ArticleRequest extends FormRequest
             'category_id.required' => 'Kategori tidak boleh kosong',
             'content.required' => 'Konten tidak boleh kosong',
             'status.required' => 'Status tidak boleh kosong',
-            'tags.required' => 'Tags tidak boleh kosong',
+            'keywords.required' => 'Keywords tidak boleh kosong',
         ];
     }
 

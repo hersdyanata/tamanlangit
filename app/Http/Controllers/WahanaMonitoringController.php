@@ -23,7 +23,7 @@ class WahanaMonitoringController extends Controller
      */
     public function index()
     {
-        $data = Wahana::with(['rooms'])->get();
+        $data = Wahana::with(['rooms', 'images'])->get();
         return view('modules.wahana_monitoring.index')
                 ->with([
                     'title' => 'Monitoring Wahana',

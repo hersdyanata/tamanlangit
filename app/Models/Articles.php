@@ -21,6 +21,7 @@ class Articles extends Model
         'url',
         'created_by',
         'updated_by',
+        'keywords',
     ];
 
     protected static function boot()

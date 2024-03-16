@@ -445,7 +445,9 @@
             // Populate the room_id select element with options
             if(this.value != ''){
                 rooms.forEach(function(room) {
-                    $('#room_id').append('<option value="' + room.id + '">' + room.name + '</option>');
+                    if(room.status == 'A'){
+                        $('#room_id').append('<option value="' + room.id + '">' + room.name + '</option>');
+                    }
                 });
     
                 // Trigger select2 to update

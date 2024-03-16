@@ -9,6 +9,8 @@ use App\Models\WahanaFacility;
 use App\Models\WahanaImage;
 use DataTables;
 use DB;
+use Illuminate\Support\Str;
+use App\Http\Requests\WahanaRequest;
 
 class WahanaController extends Controller
 {
@@ -121,7 +123,7 @@ class WahanaController extends Controller
     /**
      * Store a newly created resource in storage.
      */
-    public function store(Request $request)
+    public function store(WahanaRequest $request)
     {
         $rooms = array();
         $facilities = array();
@@ -136,7 +138,9 @@ class WahanaController extends Controller
                     'user_choose_room' => (isset($request->user_choose_room)) ? 'Y' : 'N',
                     'room_name' => $request->room_name,
                     'price' => $request->price,
-                    'url' => str_replace(' ', '-', strtolower($request->name))
+                    'slug' => Str::slug($request->name),
+                    'keywords' => $request->keyword,
+                    'created_by' => auth()->user()->id
                 ]);
 
                 for($i = 1; $i <= $wahana->room_available; $i++){
@@ -214,6 +218,18 @@ class WahanaController extends Controller
         return response()->json($res,200);    
     }
 
+    public function mark_as_map(Request $request, $id){
+        WahanaImage::where('wahana_id', $request->wahana_id)->update(['is_map' => null]);
+        $data = WahanaImage::find($id);
+        $data->is_map = 'Y';
+        $data->save();
+
+        return response()->json([
+            'msg_title' => 'Berhasil',
+            'msg_body' => 'Gambar telah ditandai sebagai peta',
+        ], 200);
+    }
+
     public function load_facility(string $id)
     {
         $facilities = WahanaFacility::where('wahana_id', $id)->get();
@@ -236,7 +252,7 @@ class WahanaController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(WahanaRequest $request, string $id)
     {
         try {
             DB::beginTransaction();
@@ -248,7 +264,9 @@ class WahanaController extends Controller
                 $wahana->room_available = $request->room_available;
                 $wahana->user_choose_room = (isset($request->user_choose_room)) ? 'Y' : 'N';
                 $wahana->price = $request->price;
-                $wahana->url = str_replace(' ', '-', strtolower($request->name));
+                $wahana->slug = Str::slug($request->name);
+                $wahana->keywords = $request->keywords;
+                $wahana->updated_by = auth()->user()->id;
                 $wahana->save();
             DB::commit();
         } catch (\Exception $e){
@@ -274,7 +292,10 @@ class WahanaController extends Controller
         $wahana = Wahana::find($id);
         WahanaRoom::where('wahana_id', $wahana->id)->delete();
         WahanaFacility::where('wahana_id', $wahana->id)->delete();
-        WahanaImage::where('wahana_id', $wahana->id)->delete();
+        $images = WahanaImage::where('wahana_id', $wahana->id)->get();
+        foreach ($images as $image) {
+            $this->destroy_image($image->id);
+        }
         $res = [
             'msg_title' => 'Berhasil',
             'msg_body' => 'Wahana '.$wahana->name.' telah dihapus.',

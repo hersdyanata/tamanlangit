@@ -144,7 +144,7 @@
     function openReceipt(i){
         var inchesToPixels = 96;
         var widthInInches = 5;
-        var heightInInches = 2.5;
+        var heightInInches = 2.7;
 
         var widthInPixels = widthInInches * inchesToPixels;
         var heightInPixels = heightInInches * inchesToPixels;

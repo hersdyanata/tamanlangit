@@ -37,6 +37,13 @@
                             </div>
                         </div>
 
+                        <div class="row mb-3">
+                            <label class="col-form-label col-lg-2">Keywords</label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control" name="keywords" id="keywords" value="{{ $cms->keywords }}">
+                            </div>
+                        </div>
+
                         <div class="row">
                             <label class="col-form-label col-lg-2"></label>
                             <div class="col-lg-10">

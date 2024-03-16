@@ -4,14 +4,14 @@ namespace App\Providers;
 
 use Illuminate\Support\ServiceProvider;
 
-class SidebarServiceProvider extends ServiceProvider
+class GlobalServiceProvider extends ServiceProvider
 {
     /**
      * Register services.
      */
     public function register(): void
     {
-        require_once app_path('Helpers/sidebar.php');
+        require_once app_path('Helpers/global_vars.php');
     }
 
     /**

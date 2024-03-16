@@ -31,6 +31,7 @@
                 <div class="card-body border-bottom border-light">
                     <form id="form_data">
                         @csrf
+                        <input type="hidden" name="id" id="id" value="{{ $wahana->id }}" readonly>
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-2">Nama Wahana</label>
                             <div class="col-lg-10">
@@ -44,6 +45,14 @@
                                 <div class="mb-3">
                                     <textarea name="description" class="form-control" id="ckeditor_classic_prefilled">{{ $wahana->description }}</textarea>
                                 </div>
+                            </div>
+                        </div>
+
+                        <div class="row mb-3">
+                            <label class="col-form-label col-lg-2">Keywords</label>
+                            <div class="col-lg-10">
+                                <input type="text" class="form-control mb-1" name="keywords" id="keywords" value="{{ $wahana->keywords }}">
+                                <span class="text-muted">Dipisahkan dengan <code>koma (,)</code> dan tanpa spasi</span>
                             </div>
                         </div>
 
@@ -318,8 +327,7 @@
             url: "{{ route('wahana.paket.update', $wahana->id) }}",
             data: $('#form_data').serialize(),
             success: function (s) {
-                sw_success(s);
-                // sw_success_redirect(s, "{{ route('wahana.paket.index') }}");
+                sw_success_redirect(s, "{{ route('wahana.paket.index') }}");
             },
             error: function(e){
                 sw_multi_error(e);

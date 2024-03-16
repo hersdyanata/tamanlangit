@@ -15,5 +15,6 @@ class WahanaImage extends Model
     protected $fillable = [
         'wahana_id',
         'image_path',
+        'is_map'
     ];
 }

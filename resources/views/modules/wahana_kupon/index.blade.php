@@ -57,7 +57,7 @@
 
 @section('page_js')
 <script>
-    // sidebar_collapsed();
+    sidebar_collapsed();
     var tableData;
     $(document).ready(function() {
         tableData = $('.datatable-basic').DataTable({

@@ -7,6 +7,7 @@ use App\Models\ArticleCategories;
 use DB;
 use DataTables;
 use App\Http\Requests\ArticleCategoryRequest;
+use Illuminate\Support\Str;
 
 class CmsKategoriController extends Controller
 {
@@ -73,7 +74,7 @@ class CmsKategoriController extends Controller
             DB::beginTransaction();
                 ArticleCategories::create([
                     'title' => $request->title,
-                    'url' => str_replace(' ', '-', strtolower($request->title)),
+                    'url' => Str::slug($request->title), //str_replace(' ', '-', strtolower($request->title)),
                     'created_by' => auth()->user()->id,
                 ]);
             DB::commit();
@@ -127,7 +128,7 @@ class CmsKategoriController extends Controller
             DB::beginTransaction();
                 $kategori = ArticleCategories::find($id);
                 $kategori->title = $request->title;
-                $kategori->url =str_replace(' ', '-', strtolower($request->title));
+                $kategori->url = Str::slug($request->title); //str_replace(' ', '-', strtolower($request->title));
                 $kategori->updated_by = auth()->user()->id;
                 $kategori->save();
             DB::commit();

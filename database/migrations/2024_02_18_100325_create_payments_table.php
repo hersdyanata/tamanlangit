@@ -18,8 +18,8 @@ return new class extends Migration
             $table->string('method', 10);
             $table->integer('amount');
             $table->string('status', 10);
-            $table->dateTime('pay_date');
-            $table->bigInteger('received_by');
+            $table->dateTime('pay_date')->nullable();
+            $table->bigInteger('received_by')->nullable();
         });
     }
 

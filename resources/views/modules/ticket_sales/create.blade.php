@@ -37,7 +37,7 @@
 
         <div class="row mb-2">
             <div class="col-lg-5">
-                <input type="text" class="form-control" name="batch_number" id="batch_number" placeholder="Masukkan Nomor Batch. Contoh: 240227ER lalu tekan enter untuk memuat data..." autofocus autocomplete="off"> 
+                <input type="text" class="form-control setToUpper" name="batch_number" id="batch_number" placeholder="Masukkan Nomor Batch. Contoh: 240227ER lalu tekan enter untuk memuat data..." autofocus autocomplete="off"> 
             </div>
 
             <div class="col-lg-4 mt-2" id="loader">
@@ -92,7 +92,7 @@
             <div class="col-lg-6">
                 <span class="form-check-label fw-bold text-warning">TIKET TIDAK TERJUAL</span>
             
-                <input type="text" class="mt-2 form-control" name="serial_number" id="serial_number" placeholder="Masukkan nomor seri yang tidak terjual..." autofocus autocomplete="off"> 
+                <input type="text" class="mt-2 form-control setToUpper" name="serial_number" id="serial_number" placeholder="Masukkan nomor seri yang tidak terjual..." autofocus autocomplete="off"> 
                 <table class="table mt-2 table-bordered datatable-basic table-xs table-hover">
                     <thead>
                         <tr class="table-border-double bg-teal bg-opacity-20">
@@ -116,7 +116,7 @@
         $(this).select2();
     });
 
-    $('#serial_number').keyup(function() {
+    $('.setToUpper').keyup(function() {
         this.value = this.value.toLocaleUpperCase();
     });
 

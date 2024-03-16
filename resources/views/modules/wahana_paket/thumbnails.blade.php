@@ -12,14 +12,19 @@
 
             <div class="card-body">
                 <div class="d-flex align-item-center flex-wrap">
-                    {{-- <div>
-                        <div class="fw-semibold me-2">{{ $r->image_path }}</div>
-                        <span class="fs-sm text-muted">Size: 432kb</span>
-                    </div> --}}
+                    <div>
+                        <div class="fw-semibold me-2">{{ ($r->is_map == 'Y') ? 'peta' : '' }}</div>
+                        {{-- <span class="fs-sm text-muted">Size: 432kb</span> --}}
+                    </div>
 
-                    {{-- <div class="d-inline-flex"> --}}
-                        <a href="#" class="text-body align-item-center" onclick="preaction({{ $r->id }})"><i class="ph-trash" style="font-size: 32px"></i></a>
-                    {{-- </div> --}}
+                    <div class="d-inline-flex">
+                        <a href="#" class="text-body align-item-center tooltiped" onclick="preaction({{ $r->id }})" title="Hapus">
+                            <i class="ph-trash" style="font-size: 32px"></i>
+                        </a>
+                        <a href="#" class="text-body align-item-center tooltiped" onclick="markAsMap({{ $r->wahana_id }},{{ $r->id }})" title="Tandai sebagai peta">
+                            <i class="ph-map-trifold" style="font-size: 32px"></i>
+                        </a>
+                    </div>
                 </div>
             </div>
         </div>

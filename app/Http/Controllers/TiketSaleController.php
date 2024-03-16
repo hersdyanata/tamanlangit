@@ -180,6 +180,31 @@ class TiketSaleController extends Controller
         ], 200);
     }
 
+    public function get_batch($code){
+        $data = Tickets::with(['serials'])->where('code', $code)->first();
+        if(isset($data)){
+            if($data->status == 'aktif'){
+                $res = [
+                    'isFound' => true,
+                    'msg_body' => 'Tiket Batch #'.$data->code.' ditemukan!',
+                    'data' => $data,
+                ];
+            }else{
+                $res = [
+                    'isFound' => false,
+                    'msg_body' => 'Tiket Batch #'.$data->code.' sudah selesai!',
+                ];
+            }
+        }else{
+            $res = [
+                'isFound' => false,
+                'msg_body' => 'Tiket Batch #'.$code.' tidak ditemukan!',
+            ];
+        }
+
+        return response()->json($res, 200);
+    }
+
     /**
      * Display the specified resource.
      */
