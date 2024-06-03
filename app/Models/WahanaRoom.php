@@ -16,7 +16,7 @@ class WahanaRoom extends Model
     protected $fillable = [
         'wahana_id',
         'name',
-        'status',
+        'status', // A=aktif, RV=reserved, NA=tidak aktif
         'last_checkin' ,
     ];
 }

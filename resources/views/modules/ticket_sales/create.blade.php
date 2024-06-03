@@ -14,14 +14,12 @@
     <div class="card-header d-sm-flex align-items-sm-center py-sm-0">
         <h6 class="py-sm-3 mb-sm-auto"><i class="ph-list-bullets"></i> {{ $title }}</h6>
         <div class="ms-sm-auto my-sm-auto">
-            @can('cms-blog-kategori-create')
-                <a href="{{ route('tiket.terjual.index') }}" class="btn btn-warning btn-labeled btn-labeled-start">
-                    <span class="btn-labeled-icon bg-black bg-opacity-20 text-white">
-                        <i class="ph-arrow-left"></i>
-                    </span>
-                    Kembali
-                </a> 
-            @endcan
+            <a href="{{ route('tiket.sales.presale.index') }}" class="btn btn-warning btn-labeled btn-labeled-start">
+                <span class="btn-labeled-icon bg-black bg-opacity-20 text-white">
+                    <i class="ph-arrow-left"></i>
+                </span>
+                Kembali
+            </a>
         </div>
     </div>
 
@@ -57,9 +55,10 @@
         <div class="row">
             <div class="col-lg-6">
                 <div class="mt-2">
-                    <span class="form-check-label fw-bold text-warning">TIKET BATCH</span>
+                    <span class="form-check-label fw-bold text-warning">TIKET PRESALE</span>
+                    <input type="hidden" name="category_id" id="category_id" readonly>
             
-                    <table class="table table-bordered datatable-basic table-xs table-hover">
+                    <table class="table mt-2 table-bordered datatable-basic table-xs table-hover">
                         <tr>
                             <td width="30%">Kode</td>
                             <td id="id" hidden></td>
@@ -91,6 +90,12 @@
             
             <div class="col-lg-6">
                 <span class="form-check-label fw-bold text-warning">TIKET TIDAK TERJUAL</span>
+
+                <input type="hidden" name="sold_out" id="sold_out" value="false" readonly>
+                <div class="mt-2 mb-2 form-check form-check-inline form-switch">
+                    <input type="checkbox" class="form-check-input" id="sold_out_toggle">
+                    <label class="form-check-label" for="sold_out_toggle" id="sold_out_toggle"> Sold Out</label>
+                </div>
             
                 <input type="text" class="mt-2 form-control setToUpper" name="serial_number" id="serial_number" placeholder="Masukkan nomor seri yang tidak terjual..." autofocus autocomplete="off"> 
                 <table class="table mt-2 table-bordered datatable-basic table-xs table-hover">
@@ -126,12 +131,18 @@
     let displayCode = document.getElementById('code');
     let displayDescription = document.getElementById('description');
     let displayCategory = document.getElementById('category');
+    let inputCategoryId = document.getElementById('category_id');
     let displayQuantity = document.getElementById('quantity');
     let displayPrice = document.getElementById('price');
     let displayStatus = document.getElementById('status');
     let tableSerial = document.getElementById('tableSerial');
     let btnSave = document.getElementById('saveButton');
+    let soldOutToggle = document.getElementById('sold_out_toggle');
+    let soldOut = document.getElementById('sold_out');
+
     btnSave.disabled = true;
+    soldOutToggle.disabled = true;
+
     let counter = 1;
     let serialNumbers = [];
 
@@ -164,6 +175,20 @@
                     }
                 }
             }
+        }
+    });
+
+    soldOutToggle.addEventListener('change', function(){
+        if (this.checked) {
+            btnSave.disabled = false;
+            inputSerialNumber.disabled = true;
+            soldOut.value = true;
+            tableSerial.innerHTML = '';
+            let serialNumbers = [];
+        } else {
+            btnSave.disabled = true;
+            inputSerialNumber.disabled = false;
+            soldOut.value = false;
         }
     });
 
@@ -233,7 +258,7 @@
     function getData(ticketNumber){
         $.ajax({
             type: "GET",
-            url: "{{ route('tiket.terjual.get_batch', ':id') }}".replace(':id', ticketNumber),
+            url: "{{ route('tiket.sales.presale.get_batch', ':id') }}".replace(':id', ticketNumber),
             beforeSend: function(){
                 $('#loader').show();
             },
@@ -244,11 +269,13 @@
                     displayId.textContent = s.data.id;
                     displayCode.textContent = '#' + s.data.code;
                     displayDescription.textContent = s.data.description;
-                    displayCategory.textContent = s.data.category;
+                    displayCategory.textContent = s.data.category.name;
                     displayQuantity.textContent = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(s.data.quantity);
                     displayPrice.textContent = new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(s.data.price);
                     displayStatus.textContent = s.data.status;
+                    inputCategoryId.value = s.data.category_id;
                     inputSerialNumber.disabled = false;
+                    soldOutToggle.disabled = false;
                     inputSerialNumber.focus();
 
                     arrSerials = s.data.serials;
@@ -275,13 +302,15 @@
     }
 
     function save(){
+        console.log(soldOutToggle.value);
         $.ajax({
             type: "POST",
-            url: "{{ route('tiket.terjual.store') }}",
+            url: "{{ route('tiket.sales.presale.store') }}",
             data: {
                 _token: "{{ csrf_token() }}",
-                batch_id: displayId.textContent,
-                category: displayCategory.textContent,
+                ref_id: displayId.textContent,
+                sold_out: soldOut.value,
+                category_id: inputCategoryId.value,
                 price: displayPrice.textContent,
                 data: {
                     serials: JSON.stringify(serialNumbers)
@@ -289,12 +318,12 @@
             },
             beforeSend: function(){
                 $('#loader').show();
-                // btnSave.disabled = true;
+                btnSave.disabled = true;
             },
             success: function (s) {
                 sw_success(s);
                 setTimeout(function() {
-                    window.location.href = "{{ route('tiket.terjual.index') }}";
+                    window.location.href = "{{ route('tiket.sales.presale.index') }}";
                 }, 3000);
             },
             error: function(e){
@@ -302,7 +331,7 @@
             },
             complete: function(){
                 $('#loader').hide();
-                // btnSave.disabled = false;
+                btnSave.disabled = false;
             }
         });
     }

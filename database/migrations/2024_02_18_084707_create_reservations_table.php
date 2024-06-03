@@ -36,9 +36,8 @@ return new class extends Migration
             $table->string('discount_type', 15)->nullable();
             $table->integer('discount_amount')->nullable();
             $table->string('payment_status', 10)->nullable();
-            $table->string('cancel_flag', 1)->nullable();
+            $table->string('reservation_status', 1)->nullable();
             $table->string('cancel_reason')->nullable();
-            $table->string('complete_flag', 1)->nullable();
             $table->integer('eo_id')->nullable();
             $table->integer('eo_commission')->nullable();
             $table->string('eo_commission_type', 15)->nullable();
@@ -46,7 +45,7 @@ return new class extends Migration
             $table->integer('omzet');
             $table->timestamps();
 
-            $table->index(['id', 'trans_num', 'trans_via', 'start_date', 'end_date', 'checkin_date', 'checkout_date', 'wahana_id', 'room_id', 'coupon_id', 'payment_status', 'cancel_flag', 'complete_flag', 'eo_id'], 'rv_index');
+            $table->index(['id', 'trans_num', 'trans_via', 'start_date', 'end_date', 'checkin_date', 'checkout_date', 'wahana_id', 'room_id', 'coupon_id', 'payment_status', 'reservation_status', 'eo_id'], 'rv_index');
         });
 
         

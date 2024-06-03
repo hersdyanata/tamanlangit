@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Wahana;
+use App\Models\WahanaRoom;
 use App\Models\Reservations;
 use DB;
 use App\Models\Payments;
@@ -13,8 +14,9 @@ use App\Models\Coupons;
 use App\Models\EventOrganizer;
 use App\Http\Requests\ReservasiOnsiteRequest;
 use Illuminate\Support\Facades\Cache;
-use App\Models\ReservedDates;
+use Carbon\Carbon;
 use App\Helpers\Reservation;
+use App\Models\Configuration;
 
 class TransReservasiOnsiteController extends Controller
 {
@@ -33,7 +35,33 @@ class TransReservasiOnsiteController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Reservations::with(['payments', 'wahana', 'room'])->get();
+            if(!isset($request->dashboard)){
+                if(!isset($request->setFilter)){
+                    $data = Reservations::with(['payments', 'wahana', 'room'])->orderBy('created_at', 'desc')->get();
+                }else{
+                    $data = Reservations::with(['payments', 'wahana', 'room'])
+                            ->when(request('xReservationStatus'), function($rec, $search){
+                                $rec->whereIn('reservation_status', $search);
+                            })
+                            ->when(request('xTransVia'), function($rec, $search){
+                                $rec->whereIn('trans_via', $search);
+                            })
+                            ->when(request('xPaymentStatus'), function($rec, $search){
+                                $rec->whereIn('payment_status', $search);
+                            })
+                            ->when(request('xPeriod'), function($rec, $search){
+                                $rec->whereBetween('start_date', explode(' - ', $search));
+                            })->orderBy('created_at', 'desc')->get();
+                }
+            }else{
+                if($request->subject === 'checkin'){
+                    $data = Reservations::with(['payments', 'wahana', 'room'])->whereNotNull('checkin_date')->orderBy('start_date', 'desc')->get();
+                }else{
+                    $data = Reservations::with(['payments', 'wahana', 'room'])->where('start_date', '>', Carbon::now())->whereNull('checkin_date')->where('reservation_status', 'aktif')->orderBy('start_date', 'asc')->get();
+                }
+            }
+
+            // dd($request->all());
             return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('actions', function ($row){
@@ -42,12 +70,19 @@ class TransReservasiOnsiteController extends Controller
                     $btn .= '<button type="button" class="btn btn-sm btn-outline-info btn-icon tooltiped" title="Cetak Tiket" onclick="openReceipt('.$row->id.')">
                                 <i class="icon-ticket"></i>
                             </button> ';
+                    
+                    if($row->refund !== null){
+                        $disableRefundButton = ($row->refund_status === 'selesai') ? 'disabled' : '';
+                        $btn .= '<button type="button" class="btn btn-sm btn-outline-indigo btn-icon tooltiped" title="Selesaikan Refund" onclick="finish_refund('.$row->id.')" '.$disableRefundButton.'>
+                                <i class="icon-task"></i>
+                            </button> ';
+                    }
                 }
 
                 return $btn;
             })->addColumn('a_tiket', function ($row) {
                 $link_style = 'success';
-                if($row->cancel_flag == 'Y'){
+                if($row->reservation_status == 'cancel'){
                     $link_style = 'danger';
                 }
                 return '<a href="'.route('transaksi.cash-reservasi.show', $row->id).'" class="text-'.$link_style.' link-'.$link_style.' tooltiped" title="Lihat Detail">#'.$row->trans_num.'</a>';
@@ -56,7 +91,7 @@ class TransReservasiOnsiteController extends Controller
         }
         return view('modules.cashier_reservasi.index')
                 ->with([
-                    'title' => 'Reservasi On-Site',
+                    'title' => 'Reservasi',
                     'wahanas' => Wahana::with(['rooms'])->get(),
                 ]);
     }
@@ -143,7 +178,8 @@ class TransReservasiOnsiteController extends Controller
                     'ppn' => $request->ppn,
                     'ppn_amount' => str_replace('.', '', $request->ppn_amount),
                     'total_amount' => str_replace('.', '', $request->total_amount),
-                    'payment_status' => 'paid',
+                    'payment_status' => ($request->has('toggle_paylater')) ? 'pending' : 'paid',
+                    'reservation_status' => 'aktif',
                     'eo_id' => $request->eo_id,
                     'eo_commission' => $request->eo_commission,
                     'eo_commission_type' => $request->eo_commission_type,
@@ -162,32 +198,33 @@ class TransReservasiOnsiteController extends Controller
                     $coupon->save();
                 }
 
-                $payment = array();
-                if($request->payment_method != 'split'){
-                    $payment = [
-                        'payment_for' => 'reservation',
-                        'trans_id' => $header->id,
-                        'method' => $request->payment_method,
-                        'amount' => str_replace('.', '', $request->total_amount),
-                        'status' => 'paid',
-                        'pay_date' => now(),
-                        'received_by' => auth()->user()->id
-                    ];
-                }else{
-                    foreach ($request->input('pay') as $i => $v) {
-                        $payment[] = [
+                if($header->payment_status !== 'pending'){
+                    $payment = array();
+                    if($request->payment_method != 'split'){
+                        $payment = [
                             'payment_for' => 'reservation',
                             'trans_id' => $header->id,
-                            'method' => $i,
-                            'amount' => str_replace('.', '', $request->pay[$i]),
+                            'method' => $request->payment_method,
+                            'amount' => str_replace('.', '', $request->total_amount),
                             'status' => 'paid',
                             'pay_date' => now(),
                             'received_by' => auth()->user()->id
                         ];
+                    }else{
+                        foreach ($request->input('pay') as $i => $v) {
+                            $payment[] = [
+                                'payment_for' => 'reservation',
+                                'trans_id' => $header->id,
+                                'method' => $i,
+                                'amount' => str_replace('.', '', $request->pay[$i]),
+                                'status' => 'paid',
+                                'pay_date' => now(),
+                                'received_by' => auth()->user()->id
+                            ];
+                        }
                     }
+                    Payments::insert($payment);
                 }
-
-                Payments::insert($payment);
             DB::commit();
         } catch (\Exception $e){
             DB::rollback();
@@ -203,6 +240,42 @@ class TransReservasiOnsiteController extends Controller
             'msg_body' => 'Data berhasil disimpan. Nomor transaksi: <strong>#'.$header->trans_num.'</strong>',
             'trans_id' => $header->id
         ], 200);
+    }
+
+    public function pay_onsite(Request $request, $id)
+    {
+        $payment = array();
+        if($request->payment_method != 'split'){
+            $payment = [
+                'payment_for' => 'reservation',
+                'trans_id' => $id,
+                'method' => $request->payment_method,
+                'amount' => str_replace('.', '', $request->total_amount),
+                'status' => 'paid',
+                'pay_date' => now(),
+                'received_by' => auth()->user()->id
+            ];
+        }else{
+            foreach ($request->input('pay') as $i => $v) {
+                $payment[] = [
+                    'payment_for' => 'reservation',
+                    'trans_id' => $id,
+                    'method' => $i,
+                    'amount' => str_replace('.', '', $request->pay[$i]),
+                    'status' => 'paid',
+                    'pay_date' => now(),
+                    'received_by' => auth()->user()->id
+                ];
+            }
+        }
+        $payment = Payments::insert($payment);
+        if($payment){
+            $reservation = Reservations::find($id);
+            $reservation->payment_status = 'paid';
+            $reservation->save();
+        }
+
+        return redirect()->route('transaksi.cash-reservasi.show', $id);
     }
 
     public function receipt($id)
@@ -221,11 +294,12 @@ class TransReservasiOnsiteController extends Controller
      */
     public function show(string $id)
     {
-        $data = Reservations::with(['coupon', 'eo', 'wahana', 'room',])->find($id);
+        $data = Reservations::with(['coupon', 'eo', 'wahana', 'room', 'extras', 'extras.stock', 'extras.stock.product'])->find($id);
         return view('modules.cashier_reservasi.detail')
                 ->with([
                     'title' => 'Detail Reservasi #'.$data->trans_num,
                     'data' => $data,
+                    'cancelRules' => Configuration::where('prefix', 'cancel')->get(),
                 ]);
     }
 
@@ -243,18 +317,37 @@ class TransReservasiOnsiteController extends Controller
     public function update(Request $request, string $id)
     {
         if($request->_to == 'cancel'){
-            $res = $this->cancel_reservation($request->id, $request->_reason);
+            $res = $this->cancel_reservation($request->id, $request->_reason, $request->_refund, $request->_omzet);
         }
 
         return response()->json($res, 200);
     }
 
-    public function cancel_reservation($id, $message)
+    public function finish_refund(Request $request, string $id)
     {
         $data = Reservations::find($id);
-        $data->cancel_flag = 'Y';
-        $data->payment_status = 'cancel';
+        $data->refund_status = 'selesai';
+        $data->refund_date = now();
+        $data->save();
+        
+        return [
+            'msg_title' => 'Berhasil',
+            'msg_body' => 'Refund dari reservasi <strong>#'.$data->trans_num.'</strong> sudah diselesaikan!',
+        ];  
+    }
+
+    public function cancel_reservation($id, $message, $refund, $omzet)
+    {
+        $data = Reservations::find($id);
+        $data->reservation_status = 'cancel';
         $data->cancel_reason = $message;
+        $data->refund = $refund;
+        $data->omzet = $omzet;
+
+        $room = WahanaRoom::find($data->room_id);
+        $room->status = 'A';
+
+        $room->save();
         $data->save();
 
         Payments::where('payment_for', 'reservation')->where('trans_id', $id)->update(['status' => 'cancel']);

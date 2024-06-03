@@ -43,8 +43,6 @@ class Wahana extends Model
     }
 
     public function reservations(){
-        return $this->hasMany(Reservations::class, 'wahana_id', 'id')
-                ->whereNull('cancel_flag')
-                ->whereNull('complete_flag');
+        return $this->hasMany(Reservations::class, 'wahana_id', 'id')->where('reservation_status', 'aktif');
     }
 }

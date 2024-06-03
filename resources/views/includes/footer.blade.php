@@ -3,7 +3,7 @@
         <span>&copy; 2024 <a href="#">{{ env('APP_NAME') }}</a></span>
         {{-- <code>🏕️</code> --}}
         {{-- <code>Made with💓</code> --}}
-        {{-- <code>PHP v{{ PHP_VERSION }}</code> --}}
+        <code>PHP v{{ PHP_VERSION }}</code>
         {{-- <code>Made with Laravel v{{ Illuminate\Foundation\Application::VERSION }}</code> --}}
     </div>
 </div>

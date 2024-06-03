@@ -14,14 +14,14 @@ return new class extends Migration
         Schema::create('ticket_sales', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('trans_type', 10); // bulk, direct
-            $table->bigInteger('ticket_batch_id');
+            $table->bigInteger('reference_id');
             $table->string('serial_number', 10);
             $table->string('category', 20);
             $table->integer('price');
             $table->dateTime('sold_date');
             $table->bigInteger('created_by');
 
-            $table->index(['trans_type', 'ticket_batch_id', 'serial_number', 'category', 'sold_date', 'created_by'], 'ticket_sales_idx');
+            $table->index(['trans_type', 'reference_id', 'serial_number', 'category', 'sold_date', 'created_by'], 'ticket_sales_idx');
         });
     }
 

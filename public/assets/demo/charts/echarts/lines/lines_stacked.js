@@ -68,7 +68,7 @@ var EchartsLinesStackedLight = function() {
 
                 // Add legend
                 legend: {
-                    data: ['Edge', 'Opera', 'Safari', 'Firefox', 'Chrome'],
+                    data: ['Firefox', 'Chrome'],
                     itemHeight: 8,
                     itemGap: 30,
                     textStyle: {
@@ -145,33 +145,6 @@ var EchartsLinesStackedLight = function() {
 
                 // Add series
                 series: [
-                    {
-                        name: 'Edge',
-                        type: 'line',
-                        stack: 'Total',
-                        smooth: true,
-                        symbol: 'circle',
-                        symbolSize: 8,
-                        data: [120, 132, 101, 134, 90, 230, 210]
-                    },
-                    {
-                        name: 'Opera',
-                        type: 'line',
-                        stack: 'Total',
-                        smooth: true,
-                        symbol: 'circle',
-                        symbolSize: 8,
-                        data: [220, 182, 191, 234, 290, 330, 310]
-                    },
-                    {
-                        name: 'Safari',
-                        type: 'line',
-                        stack: 'Total',
-                        smooth: true,
-                        symbol: 'circle',
-                        symbolSize: 8,
-                        data: [150, 232, 201, 154, 190, 330, 410]
-                    },
                     {
                         name: 'Firefox',
                         type: 'line',

@@ -41,7 +41,7 @@ class EmailReservation extends Mailable
         return new Content(
             view: 'emails.reservation',
             with: [
-                'data' => $this->data
+                'data' => $this->data,
             ]
         );
     }

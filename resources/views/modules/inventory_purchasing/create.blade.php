@@ -255,7 +255,7 @@
             // Fill cells with data from the selected row
             cell1.innerHTML = selectedRow.code;
             cell2.innerHTML = selectedRow.name;
-            cell3.innerHTML = selectedRow.category;
+            cell3.innerHTML = selectedRow.category.name;
             cell5.innerHTML = '<div class="input-group">' +
                                     '<div class="input-group-prepend">' +
                                         '<button class="btn btn-outline-warning decrease" type="button" onmousedown="decreaseQuantity(this)" onmouseup="stopDecrease()">-</button>' +
@@ -489,7 +489,7 @@
                     { data: 'DT_RowIndex', name: 'DT_RowIndex', orderable: false, searchable: false, sortable: false },
                     { data: 'code', name: 'code', orderable: false, searchable: true, sortable: false },
                     { data: 'name', name: 'name', orderable: false, searchable: true, sortable: false },
-                    { data: 'category', name: 'category', orderable: false, searchable: true, sortable: false },
+                    { data: 'category.name', orderable: false, searchable: true, sortable: false },
                     {
                         data: null,
                         class: 'text-center',

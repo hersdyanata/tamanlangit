@@ -9,12 +9,11 @@ class TicketDirect extends Model
 {
     use HasFactory;
 
-    protected $table = 'ticket_directs';
+    protected $table = 'ticket_direct';
     protected $primaryKey = 'id';
     protected $fillable = [
         // 'code',
         'category',
-        'description',
         'price',
         'created_by',
         'updated_by'
@@ -23,5 +22,15 @@ class TicketDirect extends Model
     public function creator()
     {
         return $this->hasOne(User::class, 'id', 'created_by');
+    }
+
+    public function category_()
+    {
+        return $this->hasOne(TicketCategories::class, 'id', 'category');
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(TicketDirectSalesDetail::class, 'ticket_id', 'id');
     }
 }

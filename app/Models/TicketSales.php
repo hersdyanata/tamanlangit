@@ -12,10 +12,10 @@ class TicketSales extends Model
     protected $primaryKey = 'id';
     public $timestamps = false;
     protected $fillable = [
-        'trans_type', // bulk, direct
-        'ticket_batch_id',
+        'trans_type', // presale, direct
+        'reference_id',
         'serial_number',
-        'category',
+        'category_id',
         'price',
         'sold_date',
         'created_by'
@@ -26,9 +26,14 @@ class TicketSales extends Model
         return $this->hasOne(User::class, 'id', 'created_by');
     }
 
-    public function bulk()
+    public function presale()
     {
-        return $this->hasOne(Tickets::class, 'id', 'ticket_batch_id');
+        return $this->hasOne(Tickets::class, 'id', 'reference_id');
+    }
+
+    public function category()
+    {
+        return $this->hasOne(TicketCategories::class, 'id', 'category_id');
     }
 
     public static function generateUniqueCode()

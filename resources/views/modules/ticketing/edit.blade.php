@@ -43,13 +43,6 @@
                             </div>
                         </div>
 
-                        {{-- <div class="row mb-3">
-                            <label class="col-form-label col-lg-3">Berlaku Untuk</label>
-                            <div class="col-lg-9">
-                                <input type="text" class="form-control" name="tanggal" id="tanggal" value="{{ date('Y-m-d', strtotime($data->valid_from)) . ' - ' . date('Y-m-d', strtotime($data->valid_to)) }}">
-                            </div>
-                        </div> --}}
-
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-3">Quantity Nomor Seri</label>
                             <div class="col-lg-9">
@@ -61,10 +54,11 @@
                         <div class="row mb-3">
                             <label class="col-form-label col-lg-3">Kategori</label>
                             <div class="col-lg-9">
-                                <select class="form-control select" data-minimum-results-for-search="Infinity" name="category" id="category">
+                                <select class="form-control select" data-minimum-results-for-search="Infinity" name="category_id" id="category_id">
                                     <option value="">-- Kategori --</option>
-                                    <option value="kunjungan" {{ ($data->category == 'kunjungan') ? 'selected' : '' }}>Kunjungan</option>
-                                    <option value="parkir" {{ ($data->category == 'parkir') ? 'selected' : '' }}>Parkir</option>
+                                    @foreach ($categories as $r)
+                                        <option value="{{ $r->id }}" {{ ($r->id == $data->category_id) ? 'selected' : '' }}>{{ $r->name }}</option>
+                                    @endforeach
                                 </select>
                             </div>
                         </div>

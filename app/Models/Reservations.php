@@ -7,6 +7,7 @@ use Illuminate\Database\Eloquent\Model;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Str;
+use App\Models\Payments;
 
 class Reservations extends Model
 {
@@ -39,15 +40,32 @@ class Reservations extends Model
         'discount_type',
         'discount_amount',
         'payment_status', // paid, unpaid, pending, cancel
-        'cancel_flag',
+        'reservation_status', // aktif, cancel, selesai
         'cancel_reason',
-        'complete_flag',
+        'refund',
+        'refund_status',
+        'refund_date',
         'eo_id',
         'eo_commission',
         'eo_commission_type',
         'eo_total_commission',
-        'omzet'
+        'omzet',
+        'extra_bill',
+        'snap_token',
+        'payment_url',
+        'payment_via',
+        'va_number',
+        'expiry_time'
     ];
+
+    protected static function boot()
+    {
+        parent::boot();
+
+        static::updating(function ($model) {
+            Payments::where('payment_for', 'reservation')->where('trans_id', $model->id)->update(['status' => $model->payment_status]);
+        });
+    }
 
     public function wahana()
     {
@@ -72,6 +90,11 @@ class Reservations extends Model
     public function coupon()
     {
         return $this->hasOne(Coupons::class, 'id', 'coupon_id');
+    }
+
+    public function extras()
+    {
+        return $this->hasMany(ReservationExtraServices::class, 'reservation_id', 'id');
     }
 
     public static function generateUniqueCode()

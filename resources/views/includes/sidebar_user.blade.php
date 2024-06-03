@@ -19,7 +19,11 @@
                                 unset($exploded_route[2]);
                                 $route_db = implode('/', $exploded_route);
                                 $current_url = Request::segment(1).'/'.Request::segment(2);
-                                $child_active = ($current_url == $route_db) ? 'active' : '';
+                                // $child_active = ($current_url == $route_db) ? 'active' : '';
+                                $child_active = '';
+                                if($current_url === $route_db || Request::segment(1) === $route_db){
+                                    $child_active = 'active';
+                                }
                             @endphp
                             @if ($child_active != '')
                                 <script>
@@ -46,7 +50,16 @@
                         unset($exploded_route[2]);
                         $route_db = implode('/', $exploded_route);
                         $current_url = Request::segment(1).'/'.Request::segment(2);
-                        $menu_active = ($current_url == $route_db) ? 'active' : '';
+                        // $menu_active = ($current_url == $route_db) ? 'active' : '';
+                        // echo Request::segment(1).'/'.Request::segment(2).'<br>';
+                        // echo $route_db;
+
+                        $menu_active = '';
+                        if($current_url === $route_db || str_replace('/', '', Request::segment(1)) === $route_db){
+                            $menu_active = 'active';
+                        }
+                        // echo $current_url.'<br>';
+                        // echo $route_db.'<br>';
                     @endphp
                     <a href="{{ route($menu->route) }}" class="nav-link {{ $menu_active }}">
                         <i class="{{ $menu->icon }}"></i><span>{{ $menu->title }}</span></a>

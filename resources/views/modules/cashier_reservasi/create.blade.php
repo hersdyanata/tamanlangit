@@ -215,8 +215,15 @@
                         <span class="form-check-label fw-bold text-danger">-- TOTAL TAGIHAN --</span>
                     </div>
 
-                    <div class="mb-2">
+                    <div class="mb-3">
                         <input type="text" class="form-control border-primary" name="total_amount" id="total_amount" readonly>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-check">
+                            <input type="checkbox" name="toggle_paylater" id="toggle_paylater" class="form-check-input form-check-input-primary">
+                            <span class="form-check-label">Bayar Nanti</span>
+                        </label>
                     </div>
 
                     <div class="mb-4">
@@ -266,6 +273,7 @@
     let inputPrice = document.getElementById('price');
     let inputPersonByUser = document.getElementById('persons');
     let inputSubtotal = document.getElementById('subtotal');
+    let inputPaymentMethod = document.getElementById('payment_method');
 
     let inputCoupon = document.getElementById('coupon_id');
     let inputDiscountType = document.getElementById('discount_type');
@@ -299,6 +307,14 @@
         inputDiscountType.disabled = true;
         inputDiscount.disabled = true;
         inputDiscountAmount.disabled = true;
+
+        document.getElementById('toggle_paylater').addEventListener('change', function() {
+            if(this.checked){
+                document.getElementById('payment_method').disabled = true;
+            }else{
+                document.getElementById('payment_method').disabled = false;
+            }
+        });
 
         document.getElementById('toggle_ppn').addEventListener('change', function() {
             if(this.checked) {

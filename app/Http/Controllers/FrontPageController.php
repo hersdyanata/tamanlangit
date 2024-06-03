@@ -8,15 +8,23 @@ use App\Models\Articles;
 use App\Models\Wahana;
 use App\Models\FAQ;
 use Illuminate\Support\Facades\Cache;
+use Illuminate\Support\LazyCollection;
+use League\Csv\Reader;
+use App\Models\Reviews;
 
 class FrontPageController extends Controller
 {
     public function index(){
+        $reviews = Reader::createFromPath('reviews.csv');
+        $reviews->setHeaderOffset(0);
+        $reviews->getRecords();
+
         return view('frontends.home.index')
                 ->with([
                     'title' => 'Beranda',
                     'wahana' => Wahana::with(['images'])->limit(6)->get(),
                     'profile' => Articles::where('url', 'tentang-kami')->first(),
+                    'reviews' => $reviews
                 ]);
     }
 
@@ -103,12 +111,14 @@ class FrontPageController extends Controller
 
     public function wahana_detail($slug){
         $data = Wahana::with(['images', 'facilities', 'rooms'])->where('slug', $slug)->first();
+        $review = Reviews::where('wahana_id', $data->id)->get();
 
         if(isset($data)){
             return view('frontends.pages.wahana_detail')
                     ->with([
                         'title' => ucwords(strtolower($data->name)),
-                        'data' => $data
+                        'data' => $data,
+                        'reviews' => $review
                     ]);
         }else{
             abort(404);

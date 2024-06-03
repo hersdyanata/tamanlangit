@@ -74,7 +74,7 @@
                 </div>
 
                 <div class="box">
-                    <small>Status</small>
+                    <small>Status Pembayaran</small>
                     <strong>{{ $data->payment_status }}</strong>
                 </div>
             </div>

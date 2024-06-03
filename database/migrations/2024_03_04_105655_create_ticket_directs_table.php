@@ -11,7 +11,7 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('ticket_directs', function (Blueprint $table) {
+        Schema::create('ticket_direct', function (Blueprint $table) {
             $table->bigIncrements('id');
             // $table->string('code', 15);
             $table->string('category', 20);

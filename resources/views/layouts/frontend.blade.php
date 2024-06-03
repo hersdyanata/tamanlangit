@@ -12,9 +12,16 @@
         <link rel="stylesheet" href="{{ asset('assets/fe/css/plugins/datepicker.css') }}">
         <link rel="stylesheet" href="{{ asset('assets/fe/css/style.min.css') }}">
         <link rel="stylesheet" href="{{ asset('assets/icons/phosphor/styles.min.css') }}">
+        <link href="{{ asset('assets/icons/icomoon/styles.min.css') }}" rel="stylesheet" type="text/css">
         @yield('page_css')
         <link rel="icon" href="{{ asset('assets/fe/img/favicon-100x100.png') }}" type="image/x-icon">
         <title>{{ ENV('APP_NAME') }} @yield('subtitle')</title>
+
+        <style>
+            .star-review {
+                color: rgb(259, 245, 28);
+            }
+        </style>
     </head>
 
     <body>

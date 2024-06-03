@@ -145,8 +145,8 @@
                         </div>
                     </div>
                     <!-- map end -->
-                </div>
 
+                </div>
 
                 <!-- sidebar -->
                 <div class="col-xl-4" data-sticky-container>
@@ -187,7 +187,7 @@
                         </ul>
 
                         <div class="mil-book-window">
-                            <form method="POST" action="{{ route('reservasi.form') }}">
+                            <form method="POST" action="{{ route('reservasi.form') }}" onsubmit="return validateForm()">
                                 @csrf
                                 <input type="hidden" name="wahana_id" value="{{ $data->id }}" readonly>
                                 <div class="mil-field-frame mil-mb-20">
@@ -199,17 +199,19 @@
 
                                 <div class="mil-field-frame mil-mb-20">
                                     <label>Tenda</label>
-                                    <select class="select" name="tent" data-minimum-results-for-search="Infinity">
+                                    <select class="select" name="tent" id="tent" data-minimum-results-for-search="Infinity">
                                         <option value="">-- Pilih Tenda --</option>
                                         @foreach ($data->rooms as $r)
-                                            <option value="{{ $r->id }}">{{ $r->name }}</option>
+                                            @if ($r->status === 'A')
+                                                <option value="{{ $r->id }}">{{ $r->name }}</option>
+                                            @endif
                                         @endforeach
                                     </select>
                                 </div>
 
                                 <div class="mil-field-frame mil-mb-20">
                                     <label>Anggota</label>
-                                    <input type="number" name="person_quantity" id="person_quantity" placeholder="Enter quantity" value="1">
+                                    <input type="number" name="person_quantity" id="person_quantity" placeholder="Enter quantity" min="1" value="1">
                                 </div>
 
                                 <button type="submit" class="mil-button mil-accent-1">
@@ -225,6 +227,8 @@
                 </div>
                 <!-- sidebar end -->
             </div>
+
+			@include('frontends.pages.wahana_reviews')
         </div>
     </div>
     <!-- room info end -->
@@ -234,6 +238,7 @@
 <script>
         let inputNightCount = document.getElementById('nights');
         let inputPerson = document.getElementById('person_quantity');
+        let inputTent = document.getElementById('tent');
 
         $(document).ready(function() {
             $('.select').each(function(){
@@ -274,5 +279,19 @@
 
             inputNightCount.value = nightCount;
         });
+
+        function validateForm() {
+            if (inputNightCount.value < 1) {
+                swalInit.fire({
+                    title: 'Maaf!',
+                    html: 'Silahkan tentukan tanggal reservasi terlebih dahulu.',
+                    type: 'error',
+                    icon: 'error',
+                    confirmButtonClass: 'btn btn-danger',
+                    allowOutsideClick: false
+                });
+                return false;
+            }
+        }
     </script>
 @endsection

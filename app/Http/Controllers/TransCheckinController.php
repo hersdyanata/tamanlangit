@@ -5,6 +5,9 @@ namespace App\Http\Controllers;
 use Illuminate\Http\Request;
 use App\Models\Reservations;
 use DB;
+use App\Models\ReservationExtraServices;
+use App\Models\InventoryStock;
+use App\Models\WahanaRoom;
 
 class TransCheckinController extends Controller
 {
@@ -51,7 +54,7 @@ class TransCheckinController extends Controller
     {
         $data = Reservations::with(['wahana', 'room', 'wahana.facilities'])
                 ->where('trans_num', $id)
-                ->whereNull('cancel_flag')
+                ->where('reservation_status', 'aktif')
                 ->whereNull('checkin_date')
                 // ->whereDate('start_date', '=', now()->format('Y-m-d'))
                 ->first();
@@ -89,6 +92,34 @@ class TransCheckinController extends Controller
         try {
             DB::beginTransaction();
                 $data = Reservations::find($id);
+                $room = WahanaRoom::find($data->room_id);
+                $room->status = 'RV';
+                $room->last_checkin = now();
+                $room->save();
+
+                if($request->total_extra_bill !== null){
+                    $extra = [];
+                    for($i = 0; $i < count($request->extra_type); $i++){
+                        $extra[] = [
+                            'reservation_id' => $id,
+                            'type' => $request->extra_type[$i],
+                            'stock_id' => $request->stock_id[$i],
+                            'price' => str_replace('.', '', $request->price[$i]),
+                            'quantity' => $request->quantity[$i],
+                            'subtotal' => str_replace('.', '', $request->subtotal[$i]),
+                        ];
+
+                        if($request->extra_type[$i] == 'item'){
+                            $stock[$i] = InventoryStock::find($request->stock_id[$i]);
+                            $stock[$i]->quantity = $stock[$i]->quantity - $request->quantity[$i];
+                            $stock[$i]->save();
+                        }
+                    }
+
+                    ReservationExtraServices::insert($extra);
+                    $data->extra_bill = $request->total_extra_bill;
+                }
+
                 $data->checkin_date = now();
                 $data->save();
             DB::commit();

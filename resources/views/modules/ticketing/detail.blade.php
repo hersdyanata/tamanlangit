@@ -4,6 +4,7 @@
     <script src="{{ asset('assets/js/vendor/tables/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/js/moment.min.js') }}"></script>
     <script src="{{ asset('assets/js/datetime.js') }}"></script>
+    <script src="{{ asset('assets/js/vendor/forms/selects/select2.min.js') }}"></script>
 @endsection
 
 @section('subtitle')
@@ -22,7 +23,8 @@
                         </span>
                         Kembali
                     </a>
-                    <button type="button" class="btn btn-primary btn-labeled btn-labeled-start" onclick="printDiv()">
+
+                    <button type="button" class="btn btn-primary btn-labeled btn-labeled-start" data-bs-toggle="modal" data-bs-target="#preprint">
                         <span class="btn-labeled-icon bg-black bg-opacity-20">
                             <i class="ph-printer"></i>
                         </span>
@@ -50,7 +52,7 @@
             </tr>
             <tr>
                 <td width="50%">Kategori</td>
-                <td>{{ $data->category }}</td>
+                <td>{{ $data->category->name }}</td>
             </tr>
             {{-- <tr>
                 <td width="50%">Masa Berlaku</td>
@@ -87,17 +89,68 @@
                     <th>Nomor Seri</th>
                     <th>Status</th>
                     <th>Tgl. Terjual</th>
+                    <th>Tgl. Cetak</th>
                 </tr>
             </thead>
             <tbody></tbody>
         </table>
     </div>
+
+    <div id="preprint" class="modal fade" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header bg-primary text-white border-0">
+					<h6 class="modal-title">Cetak Tiket Presale #{{ $data->code }}</h6>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+				</div>
+
+                <form id="form_data">
+                    @csrf
+                    <div class="modal-body">
+                        <div class="alert alert-warning alert-icon-start alert-dismissible fade show">
+                            <span class="alert-icon bg-warning text-white">
+                                <i class="ph-warning-circle"></i>
+                            </span>
+                            <span class="fw-semibold">Perhatian!</span> Pastikan kertas cukup sebelum mencetak.
+                        </div>
+
+                        <div class="row mb-2">
+                            <label class="col-form-label col-lg-3 fw-bold">Cetak</label>
+                            <div class="col-lg-9">
+                                <select class="form-control select" data-minimum-results-for-search="Infinity" name="printMethod" id="printMethod">
+                                    <option value="full">Cetak Semua</option>
+                                    <option value="partial">Cetak Parsial</option>
+                                </select>
+                            </div>
+                        </div>
+
+                        <div class="row mb-2">
+                            <label class="col-form-label col-lg-3 fw-bold">Quantity</label>
+                            <div class="col-lg-9">
+                                <input type="hidden" class="form-control" name="id" id="id" value="{{ $data->id }}" readonly>
+                                <input type="text" class="form-control" name="quantity" id="quantity"> 
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="modal-footer">
+                        <button type="button" class="btn btn-link" data-bs-dismiss="modal">Tutup</button>
+                        <button type="button" class="btn btn-primary" onclick="cetak()">Cetak</button>
+                    </div>
+                </form>
+			</div>
+		</div>
+	</div>
 @endsection
 
 @section('page_js')
 <script>
     var tableData;
     $(document).ready(function() {
+        $('.select').each(function(){
+            $(this).select2();
+        });
+
         tableData = $('#tableData').DataTable({
             serverSide: true,
             processing: true,
@@ -133,6 +186,15 @@
                         return (data != null) ? moment(data).format('DD.MM.YYYY') : '-';
                     },
                 },
+                {
+                    data: 'print_date',
+                    searchable: false,
+                    sortable: false,
+                    orderable: false,
+                    render: function(data, type, row){
+                        return (data != null) ? moment(data).format('DD.MM.YYYY') : '-';
+                    },
+                },
             ],
             order: [[0, 'asc']],
             drawCallback: function (setting) {
@@ -155,6 +217,55 @@
             tableData.draw();
         });
 
+        let printQuantity = document.getElementById('quantity');
+        printQuantity.disabled = true;
+
+        $('#printMethod').on('change', function(){
+            if(this.value === 'partial') {
+                printQuantity.disabled = false;
+                printQuantity.focus();
+            } else {
+                printQuantity.value = null;
+                printQuantity.disabled = true;
+            }
+        });
     });
+
+    function cetak(){
+        if($('#printMethod').val() === 'partial' && $('#quantity').val() === ''){
+            sw_error({'msg_body':'Silahkan isi quantity tiket yang akan dicetak!'});
+            return;
+        }
+
+        if($('#printMethod').val() === 'partial' && $('#quantity').val() > {{ $data->quantity }}){
+            sw_error({'msg_body':'Melebihi quantity tiket yang ada!'});
+            return;
+        }
+
+        var newWindow = window.open('', '_blank');
+        $.ajax({
+            type: "POST",
+            url: "{{ route('tiket.data.presale_print') }}",
+            data: $('#form_data').serialize(),
+            // beforeSend: function(){
+            //     small_loader_open('form_data');
+            // },
+            success: function (s) {
+                newWindow.document.write(s);
+                newWindow.document.close();
+            },
+            error: function(e){
+                sw_multi_error(e);
+                // small_loader_close('form_data');
+            },
+            complete: function(){
+                setTimeout(() => {
+                    reload_table(tableData);
+                }, 5000);
+                $('#preprint').modal('hide');
+                // small_loader_close('form_data');
+            }
+        });
+    }
 </script>
 @endsection

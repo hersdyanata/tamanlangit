@@ -114,7 +114,9 @@
 			color: #fff;
 			border: none;
 			border-radius: 5px;
-			display: block;
+			display: inline-block;
+            text-align: center;
+            text-decoration: none;
 			margin: 20px auto;
 		}
 
@@ -131,9 +133,15 @@
 			color: #fff;
 		}
 
-		.qrcode {
-			text-align: center;
-		}
+        .button-container {
+            display: flex;
+            justify-content: center;
+        }
+
+        .cancel-link {
+            font-style: italic;
+            color: #d31c1c;
+        }
     </style>
 </head>
 
@@ -141,7 +149,7 @@
     <div class="container">
         {{-- <img src="{{ asset('assets/images/taman_langit.png') }}" style="display: block; margin: 0 auto;"> --}}
         <img src="https://reservasi.c-ss.co.id/assets/images/taman_langit.png" style="display: block; margin: 0 auto;">
-        <h1>Reservasi Camping Private</h1>
+        <h1>Slip Reservasi</h1>
         <p>Halo {{ $data['name'] }},</p>
         <p>
 			Terima kasih sudah melakukan reservasi di {{ ENV('APP_NAME') }}.
@@ -158,7 +166,11 @@
                 <th class="price">Harga</th>
             </tr>
             <tr>
-                <td>Paket: {{ ucwords(strtolower($data['wahana']['name'])) }} ({{ $data['night_count'] }} malam)</td>
+                <td>
+                    Nomor Tiket: #{{ $data['trans_num'] }}<br>
+                    Paket: {{ ucwords(strtolower($data['wahana']['name'])) }} / Tenda {{ $data['room']['name'] }} / {{ $data['persons'] }} Orang<br>
+                    Tgl Reservasi: {{ date('Y-m-d', strtotime($data['start_date'])) }} sd. {{ date('Y-m-d', strtotime($data['end_date'])) }} / {{ $data['night_count'] }} malam
+                </td>
                 <td class="price">{{ number_format($data['price']) }}</td>
             </tr>
             <tr>
@@ -175,20 +187,13 @@
             </tr>
         </table>
 
-		<button class="pay-button">
-			<span class="pay-button-text">Lanjutkan Pembayaran</span>
-		</button>
-
-        <div class="footer">
-            <p>Ikuti kami di sosial media:</p>
-            <ul>
-                <li>
-                    <a href="https://www.instagram.com/" target="_blank"><i class="ph-instagram-logo"></i></a>
-                    <a href="https://www.facebook.com/" target="_blank"><i class="ph-facebook-logo"></i></a>
-                    <a href="https://www.youtube.com/" target="_blank"><i class="ph-youtube-logo"></i></a>
-                    <a href="https://www.youtube.com/" target="_blank"><i class="ph-tiktok-logo"></i></a>
-                </li>
-            </ul>
+        <p>Kalau kamu ngga diarahkan ke halaman pembayaran pada saat memesan silahkan klik tombol dibawah ini dan selesaikan pembayaran sebelum 24 jam.</p>
+        <div class="button-container">
+            <a href="{{ route('reservasi.make_payment', Crypt::encryptString($data['id'])) }}" class="pay-button">
+                <span class="pay-button-text">Lanjutkan Pembayaran</span>
+            </a>
         </div>
+
+        <p>Kami sungguh tidak ingin ini terjadi, tapi seandainya ada kekeliruan saat kamu memesan dan ingin membatalkan, silahkan <a href="{{ route('front_cancel', Crypt::encryptString($data['id'])) }}" target="_blank">kunjungi halaman ini.</a> <span class="cancel-link">(syarat dan ketentuan berlaku)</span></p>
 </body>
 </html>

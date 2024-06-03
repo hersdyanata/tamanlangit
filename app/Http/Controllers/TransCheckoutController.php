@@ -4,7 +4,10 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Reservations;
+use App\Models\InventoryStock;
+use App\Models\WahanaRoom;
 use DB;
+use App\Helpers\Mailer;
 
 class TransCheckoutController extends Controller
 {
@@ -49,9 +52,9 @@ class TransCheckoutController extends Controller
      */
     public function show(string $id)
     {
-        $data = Reservations::with(['wahana', 'room', 'wahana.facilities'])
+        $data = Reservations::with(['wahana', 'room', 'wahana.facilities', 'extras', 'extras.stock', 'extras.stock.product'])
                 ->where('trans_num', $id)
-                ->whereNull('cancel_flag')
+                ->where('reservation_status', 'aktif')
                 ->whereNotNull('checkin_date')
                 ->whereNull('checkout_date')
                 ->first();
@@ -84,14 +87,28 @@ class TransCheckoutController extends Controller
     /**
      * Update the specified resource in storage.
      */
-    public function update(Request $request, string $id)
+    public function update(Mailer $sendmail, Request $request, string $id)
     {
         try {
             DB::beginTransaction();
-                $data = Reservations::find($id);
+                $data = Reservations::with(['wahana', 'room', 'wahana.facilities', 'extras', 'extras.stock', 'extras.stock.product'])->find($id);
+                foreach($data->extras as $r){
+                    if($r->type == 'item' && $r->stock->product->inventory_type == 'loan'){
+                        $stock = InventoryStock::find($r->stock_id);
+                        $stock->quantity = $stock->quantity + $r->quantity;
+                        $stock->save();
+                    }
+                }
                 $data->checkout_date = now();
-                $data->complete_flag = 'Y';
+                $data->reservation_status = 'selesai';
+
+                $room = WahanaRoom::find($data->room_id);
+                $room->status = 'A';
+                
+                $room->save();
                 $data->save();
+
+                $sendmail->review($data->email, $data->id);
             DB::commit();
         } catch (\Exception $e){
             DB::rollback();
@@ -107,6 +124,15 @@ class TransCheckoutController extends Controller
         ];
 
         return response()->json($result, 200);
+    }
+
+    public function extra_service_print($id){
+        $data = Reservations::with(['extras', 'extras.stock', 'extras.stock.product'])->find($id);
+        return view('modules.cashier_checkout.receipt_extra_service')
+                ->with([
+                    'title' => 'Layanan Tambahan Reservasi #'.$data->trans_num,
+                    'data' => $data
+                ]);
     }
 
     /**

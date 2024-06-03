@@ -9,10 +9,12 @@ class Kernel extends ConsoleKernel
 {
     /**
      * Define the application's command schedule.
+     * 
+     * | * * * * * cd /path-to-your-project && php artisan schedule:run >> /dev/null 2>&1
      */
     protected function schedule(Schedule $schedule): void
     {
-        // $schedule->command('inspire')->hourly();
+        $schedule->command('app:set-expired-coupons')->dailyAt('00:03');
     }
 
     /**

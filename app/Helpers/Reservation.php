@@ -9,7 +9,10 @@ class Reservation {
     public function check_availability($request)
     {
         $tanggal = explode(' - ', $request['daterange']);
-        $reserved = ReservedDates::whereBetween('date', $tanggal)->where('wahana_id', $request['wahana_id'])->where('room_id', $request['room_id'])->get();
+        $reserved = ReservedDates::whereBetween('date', $tanggal)
+                    ->where('wahana_id', $request['wahana_id'])
+                    ->where('room_id', $request['room_id'])
+                    ->get();
     
         $message = '';
         foreach ($reserved as $index => $reservation){

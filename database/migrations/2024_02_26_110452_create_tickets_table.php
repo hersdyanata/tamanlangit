@@ -11,12 +11,10 @@ return new class extends Migration
      */
     public function up(): void
     {
-        Schema::create('tickets', function (Blueprint $table) {
+        Schema::create('ticket_presale', function (Blueprint $table) {
             $table->bigIncrements('id');
             $table->string('code', 8);
             $table->string('description', 50);
-            $table->date('valid_from');
-            $table->date('valid_to');
             $table->integer('quantity');
             $table->string('category', 30);
             $table->string('status', 15);

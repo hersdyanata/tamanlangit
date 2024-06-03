@@ -19,3 +19,5 @@
     @include('frontends.home.elements.about')
     @include('frontends.home.elements.reviews')
 @endsection
+
+{{-- API KEY : RZTTC2Y-YZ7M6C6-J3BWRY0-AY9DWND --}}

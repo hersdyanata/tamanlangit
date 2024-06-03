@@ -2,7 +2,7 @@
     <div class="container">
 
         <div class="mil-text-center">
-            <div class="mil-suptitle mil-mb-20 mil-fade-up">Ulasan</div>
+            <div class="mil-suptitle mil-mb-20 mil-fade-up">Ulasan Google Maps</div>
             <h2 class="mil-mb-100 mil-fade-up">Ini kata mereka!</h2>
         </div>
 
@@ -17,69 +17,19 @@
 
                 <div class="swiper-container mil-reviews-slider">
                     <div class="swiper-wrapper">
-                        <div class="swiper-slide">
-                            <div class="mil-review-frame mil-text-center" data-swiper-parallax="-250" data-swiper-parallax-opacity="0">
-                                <div class="mil-fade-up">
-                                    <h3 class="mil-mb-10">Sarah Newman</h3>
-                                    <p class="mil-link mil-mb-40">Envato market</p>
-                                </div>
-                                <p class="mil-fade-up">An unforgettable stay at aquarelle! The beachfront location provided breathtaking views, and the hotel's blend of luxury and a relaxed atmosphere was perfect. The attentive staff and excellent amenities, including a refreshing pool and superb dining options, made my experience truly exceptional. aquarelle is a haven for those seeking relaxation with a touch of indulgence. Already looking forward to my next visit to this seaside paradise!</p>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="mil-review-frame mil-text-center" data-swiper-parallax="-250" data-swiper-parallax-opacity="0">
-                                <div class="mil-fade-up">
-                                    <h3 class="mil-mb-10">Emma Trueman</h3>
-                                    <p class="mil-link mil-mb-40">Envato market</p>
-                                </div>
-                                <p class="mil-fade-up">An unforgettable stay at aquarelle! The beachfront location provided breathtaking views, and the hotel's blend of luxury and a relaxed atmosphere was perfect. The attentive staff and excellent amenities, including a refreshing pool and superb dining options, made my experience truly exceptional. aquarelle is a haven for those seeking relaxation with a touch of indulgence. Already looking forward to my next visit to this seaside paradise!</p>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="mil-review-frame mil-text-center" data-swiper-parallax="-200" data-swiper-parallax-opacity="0">
-                                <div class="mil-fade-up">
-                                    <h3 class="mil-mb-10">Sarah Newman</h3>
-                                    <p class="mil-link mil-mb-40">Envato market</p>
-                                </div>
-                                <p class="mil-fade-up">An unforgettable stay at aquarelle! The beachfront location provided breathtaking views, and the hotel's blend of luxury and a relaxed atmosphere was perfect. The attentive staff and excellent amenities, including a refreshing pool and superb dining options, made my experience truly exceptional. aquarelle is a haven for those seeking relaxation with a touch of indulgence. Already looking forward to my next visit to this seaside paradise!</p>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="mil-review-frame mil-text-center" data-swiper-parallax="-250" data-swiper-parallax-opacity="0">
-                                <div class="mil-fade-up">
-                                    <h3 class="mil-mb-10">Emma Trueman</h3>
-                                    <p class="mil-link mil-mb-40">Envato market</p>
-                                </div>
-                                <p class="mil-fade-up">An unforgettable stay at aquarelle! The beachfront location provided breathtaking views, and the hotel's blend of luxury and a relaxed atmosphere was perfect. The attentive staff and excellent amenities, including a refreshing pool and superb dining options, made my experience truly exceptional. aquarelle is a haven for those seeking relaxation with a touch of indulgence. Already looking forward to my next visit to this seaside paradise!</p>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="mil-review-frame mil-text-center" data-swiper-parallax="-250" data-swiper-parallax-opacity="0">
-                                <div class="mil-fade-up">
-                                    <h3 class="mil-mb-10">Sarah Newman</h3>
-                                    <p class="mil-link mil-mb-40">Envato market</p>
-                                </div>
-                                <p class="mil-fade-up">An unforgettable stay at aquarelle! The beachfront location provided breathtaking views, and the hotel's blend of luxury and a relaxed atmosphere was perfect. The attentive staff and excellent amenities, including a refreshing pool and superb dining options, made my experience truly exceptional. aquarelle is a haven for those seeking relaxation with a touch of indulgence. Already looking forward to my next visit to this seaside paradise!</p>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="mil-review-frame mil-text-center" data-swiper-parallax="-250" data-swiper-parallax-opacity="0">
-                                <div class="mil-fade-up">
-                                    <h3 class="mil-mb-10">Emma Trueman</h3>
-                                    <p class="mil-link mil-mb-40">Envato market</p>
-                                </div>
-                                <p class="mil-fade-up">An unforgettable stay at aquarelle! The beachfront location provided breathtaking views, and the hotel's blend of luxury and a relaxed atmosphere was perfect. The attentive staff and excellent amenities, including a refreshing pool and superb dining options, made my experience truly exceptional. aquarelle is a haven for those seeking relaxation with a touch of indulgence. Already looking forward to my next visit to this seaside paradise!</p>
-                            </div>
-                        </div>
-                        <div class="swiper-slide">
-                            <div class="mil-review-frame mil-text-center" data-swiper-parallax="-250" data-swiper-parallax-opacity="0">
-                                <div class="mil-fade-up">
-                                    <h3 class="mil-mb-10">Sarah Newman</h3>
-                                    <p class="mil-link mil-mb-40">Envato market</p>
-                                </div>
-                                <p class="mil-fade-up">An unforgettable stay at aquarelle! The beachfront location provided breathtaking views, and the hotel's blend of luxury and a relaxed atmosphere was perfect. The attentive staff and excellent amenities, including a refreshing pool and superb dining options, made my experience truly exceptional. aquarelle is a haven for those seeking relaxation with a touch of indulgence. Already looking forward to my next visit to this seaside paradise!</p>
-                            </div>
-                        </div>
+                        @foreach ($reviews as $review)
+                            @if ($review['body'] !== '')
+                                <div class="swiper-slide">
+                                    <div class="mil-review-frame mil-text-center" data-swiper-parallax="-250" data-swiper-parallax-opacity="0">
+                                        <div class="mil-fade-up">
+                                            <h3 class="mil-mb-10">{{ $review['author'] }}</h3>
+                                        </div>
+                                        <p class="mil-fade-up">{{ $review['body'] }}</p>
+                                    </div>
+                                </div>                            
+                            @endif
+                        @endforeach
+                        
                     </div>
                 </div>
 

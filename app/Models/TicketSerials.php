@@ -20,7 +20,13 @@ class TicketSerials extends Model
         'price',
         'status', // aktif / sold / expired
         'sold_date',
+        'print_date'
     ];
+
+    public function batch()
+    {
+        return $this->belongsTo(Tickets::class, 'id', 'ticket_id');
+    }
 
     public static function generateUniqueCode($ticket_id)
     {

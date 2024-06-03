@@ -28,7 +28,11 @@ class WahanaKuponController extends Controller
     public function index(Request $request)
     {
         if ($request->ajax()) {
-            $data = Coupons::get();
+            if(!isset($request->dashboard)){
+                $data = Coupons::get();
+            }else{
+                $data = Coupons::where('status', 'A')->get();
+            }
             return DataTables::of($data)
             ->addIndexColumn()
             ->addColumn('qty_balance', function ($row) {

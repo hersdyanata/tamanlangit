@@ -28,7 +28,7 @@ class TiketRequest extends FormRequest
             'description' => 'required',
             // 'tanggal' => 'required',
             'quantity' => 'required',
-            'category' => 'required',
+            'category_id' => 'required',
             'price' => 'required',
         ];
     }
@@ -38,7 +38,7 @@ class TiketRequest extends FormRequest
             'description.required' => 'Deskripsi tidak boleh kosong',
             // 'tanggal.required' => 'Silahkan tentukan masa berlaku tiket',
             'quantity.required' => 'Quantity tidak boleh kosong',
-            'category.required' => 'Kategori tidak boleh kosong',
+            'category_id.required' => 'Kategori tidak boleh kosong',
             'price.required' => 'Harga tidak boleh kosong',
         ];
     }

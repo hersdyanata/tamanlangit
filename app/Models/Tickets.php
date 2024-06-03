@@ -10,16 +10,14 @@ class Tickets extends Model
 {
     use HasFactory;
 
-    protected $table = 'tickets';
+    protected $table = 'ticket_presale';
     protected $primaryKey = 'id';
     protected $fillable = [
         'id',
         'code',
         'description',
-        'valid_from',
-        'valid_to',
         'quantity',
-        'category',
+        'category_id',
         'status', // aktif, selesai
         'price',
         'created_by',
@@ -34,6 +32,16 @@ class Tickets extends Model
     public function creator()
     {
         return $this->hasOne(User::class, 'id', 'created_by');
+    }
+
+    public function sales()
+    {
+        return $this->hasMany(TicketSales::class, 'ticket_batch_id', 'id');
+    }
+
+    public function category()
+    {
+        return $this->hasOne(TicketCategories::class, 'id', 'category_id');
     }
 
     public static function generateUniqueCode()

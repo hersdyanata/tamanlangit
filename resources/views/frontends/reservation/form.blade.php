@@ -78,7 +78,7 @@
                             <select class="select" name="tent" id="tent" data-minimum-results-for-search="Infinity">
                                 <option value="">-- Pilih Tenda --</option>
                                 @foreach ($data->rooms as $r)
-                                    @if ($r->status == 'A')
+                                    @if ($r->status === 'A')
                                         <option value="{{ $r->id }}" {{ ($tent == $r->id) ? 'selected' : '' }}>{{ $r->name }}</option>
                                     @endif
                                 @endforeach
@@ -307,6 +307,7 @@
             countNights();
             setPrice();
             calculateSubtotal();
+            calculatePpn();
             calculateTotalAmount();
             checkAvailablility();
         });
@@ -346,6 +347,7 @@
         function calculatePpn(){
             let ppn = {{ $ppn }};
             let ppn_amount = inputSubtotal.value * ppn / 100;
+            // console.log(ppn_amount);
             inputPpnAmount.value = ppn_amount;
             displayPpn.innerHTML = formatCurrency(ppn_amount);
         }
@@ -442,12 +444,16 @@
                 url: "{{ route('reservasi.submit') }}",
                 data: $('#form_data').serialize(),
                 success: function (s) {
-                    // console.log(s);
-                    sw_success_redirect(s, "{{ route('wahana') }}");
+                    let redirectUrl = "{{ route('reservasi.make_payment', ':brew') }}".replace(':brew', s.id);
+                    sw_success_redirect(s, redirectUrl);
                 },
                 error: function(e){
                     sw_multi_error(e);
-                    // small_loader_close('form_data');
+                    // if(e.msg_body){
+                    //     sw_multi_error(e);
+                    // }else{
+                    //     alert(e.error_messages);
+                    // }
                 },
                 complete: function(){
                     // small_loader_close('form_data');

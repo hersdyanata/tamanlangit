@@ -35,7 +35,7 @@
                         <th>Jenis Inventory</th>
                         <th>Quantity</th>
                         <th>Pengingat</th>
-                        <th>Harga</th>
+                        <th>Harga Jual/Sewa</th>
                         <th>Pembelian Terakhir</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -163,11 +163,11 @@
             },
             success: function(s){
                 swalInit.fire({
-                    title: (param == 'notif') ? 'Set Pengingat Minimum Quantity' : 'Set Harga Jual',
+                    title: (param == 'notif') ? 'Set Pengingat Minimum Quantity' : 'Set Harga Jual/Sewa',
                     html: (param == 'notif') ? 'Jika stock produk ' + s.msg_body + ' sudah mencapai quantity ini maka akan mendapatkan pemberitahuan.' : 'Silahkan tentukan harga jual untuk stock produk ' + s.msg_body + '.',
                     input: 'number',
                     icon: 'info',
-                    inputPlaceholder: (param == 'notif') ? 'Set quantity...' : 'Set harga jual...',
+                    inputPlaceholder: (param == 'notif') ? 'Set quantity...' : 'Set harga...',
                     showCancelButton: true,
                     allowOutsideClick: false,
                     inputValidator: function(value) {

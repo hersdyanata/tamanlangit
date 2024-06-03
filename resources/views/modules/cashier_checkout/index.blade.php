@@ -116,8 +116,10 @@
 
                 <div class="card-body">
                     <div class="border rounded p-3">
-                        <ul class="list mb-0" id="facilities">
+                        <ul class="list mb-3" id="facilities">
                         </ul>
+
+                        <div id="extras"></div>
                     </div>
                 </div>
             </div>
@@ -131,6 +133,7 @@
     $('#loader').hide();
     let inputTicket = document.getElementById('tiket');
     let btnConfirm = document.getElementById('btn_cfm');
+    let dtToPrint;
 
     let dataId = document.getElementById('id');
     let transNum = document.getElementById('trans_num');
@@ -145,6 +148,7 @@
     let persons = document.getElementById('persons');
     let paymentStatus = document.getElementById('payment_status');
     let divFacilities = document.getElementById('facilities');
+    let divExtraService = document.getElementById('extras');
 
     inputTicket.addEventListener('keydown', function(event) {
         if (event.key === 'Enter') {
@@ -169,6 +173,8 @@
                 $('#loader').show();
             },
             success: function (s) {
+                dtToPrint = s.data.id;
+                console.log(dtToPrint);
                 sw_success(s);
                 divFacilities.innerHTML = null;
                 if(s.isFound == true){
@@ -188,6 +194,25 @@
                     const facilities = s.data.wahana.facilities;
                     for(const obj of facilities){
                         divFacilities.innerHTML += '<li class="text-success fw-semibold">'+ ucwords(obj.name) +'</li>';
+                    }
+
+                    if(s.data.extra_bill !== null){
+                        divExtraService.innerHTML += '<h6 class="mb-0"><i class="ph-circles-three-plus"></i> Layanan Tambahan</h6><ul class="list" id="extras">';
+                        for(const list of s.data.extras){
+                            if(list.type == 'person'){
+                                divExtraService.innerHTML += '<li class="fw-semibold">+Anggota ['+ list.quantity+' x '+formatCurrency(list.price) +' = '+ formatCurrency(list.subtotal) +']</li>'
+                            }else{
+                                let inventory_type = (list.stock.product.inventory_type == 'loan') ? 'Sewa ' : 'Beli ';
+                                let product = list.stock.product.name+' ';
+                                let bills = '[' + list.quantity + ' x ' + formatCurrency(list.price) + ' = ' + formatCurrency(list.subtotal) + ']';
+                                divExtraService.innerHTML += '<li class="fw-semibold">'+ inventory_type + product + bills +'</li>';
+                            }
+                        }
+                        divExtraService.innerHTML += '</ul>';
+                        divExtraService.innerHTML += '<p class="mt-2 text-info">\
+                                                        Produk sewaan akan dikembalikan kedalam stock. Pastikan untuk memeriksa ulang setiap item yang disewakan.\
+                                                      </p>\
+                                                      <span class="badge btn bg-success text-black bg-opacity-30" onclick="cetak()">Cetak Layanan Tambahan</span>'
                     }
 
                     btnConfirm.disabled = false;
@@ -243,9 +268,23 @@
                 paymentStatus.textContent = null;
                 divFacilities.innerHTML = null;
                 btnConfirm.disabled = true;
+                divExtraService.innerHTML = null;
                 inputTicket.focus();
             }
         });
+    }
+
+    function cetak(){
+        var inchesToPixels = 96;
+        var widthInInches = 5;
+        var heightInInches = 7;
+
+        var widthInPixels = widthInInches * inchesToPixels;
+        var heightInPixels = heightInInches * inchesToPixels;
+        var xUrl = "{{ route('transaksi.checkout.extras_print', ':id') }}".replace(':id', dtToPrint);
+
+        // Open a new window with the specified size and navigate to a URL
+        var newWindow = window.open(xUrl, '_blank', 'width=' + widthInPixels + ', height=' + heightInPixels, 'resizable=no');
     }
 </script>
 @endsection

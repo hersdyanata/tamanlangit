@@ -4,6 +4,8 @@
     <script src="{{ asset('assets/js/vendor/tables/datatables/datatables.min.js') }}"></script>
     <script src="{{ asset('assets/js/moment.min.js') }}"></script>
     <script src="{{ asset('assets/js/datetime.js') }}"></script>
+    <script src="{{ asset('assets/js/vendor/pickers/daterangepicker.js') }}"></script>
+    <script src="{{ asset('assets/js/vendor/forms/selects/bootstrap_multiselect.js') }}"></script>
 @endsection
 
 @section('subtitle')
@@ -20,7 +22,7 @@
                         <span class="btn-labeled-icon bg-black bg-opacity-20">
                             <i class="ph-note-pencil"></i>
                         </span>
-                        Buat Baru
+                        Buat Reservasi Onsite
                     </a> 
                 @endcan
 
@@ -30,12 +32,23 @@
                     </span>
                     Reload
                 </button>
+
+                <button type="button" class="btn btn-indigo btn-labeled btn-labeled-start" data-bs-toggle="modal" data-bs-target="#filter">
+                    <span class="btn-labeled-icon bg-black bg-opacity-20">
+                        <i class="ph-magnifying-glass"></i>
+                    </span>
+                    Filter
+                </button>
             </div>
         </div>
 
         <div class="card-body">
-            <span class="badge btn bg-danger text-danger bg-opacity-10">Reservasi Dibatalkan</span>
-            <span class="badge btn bg-info text-info bg-opacity-10">Didatangkan Oleh Event Organizer</span>
+            Info: 
+            <span class="badge bg-danger text-danger bg-opacity-10">Reservasi Dibatalkan</span>
+            <span class="badge bg-info text-info bg-opacity-10">Didatangkan Oleh Event Organizer</span>
+            <span class="badge bg-teal text-teal bg-opacity-10">PY: Status Pembayaran</span>
+            <span class="badge bg-purple text-purple bg-opacity-10">RV: Status Reservasi</span>
+            <span class="badge bg-purple text-indigo bg-opacity-10">RF: Refund</span>
 
             <table class="table datatable-basic table-xs table-hover" id="tableData">
                 <thead>
@@ -57,13 +70,131 @@
             </table>
         </div>
     </div>
+
+    <div id="filter" class="modal fade" tabindex="-1" data-bs-keyboard="false" data-bs-backdrop="static">
+		<div class="modal-dialog">
+			<div class="modal-content">
+				<div class="modal-header bg-indigo text-white border-0">
+					<h6 class="modal-title">Filter Data Reservasi</h6>
+					<button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+				</div>
+
+				<div class="modal-body">
+					<div class="row mb-2">
+                        <label class="col-form-label col-lg-4 fw-bold">Periode</label>
+                        <div class="col-lg-8">
+                            <input type="text" class="form-control daterange-basic" name="tanggal" id="tanggal"> 
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label class="col-form-label col-lg-4">Reservasi Via</label>
+                        <div class="col-lg-8">
+                            <select class="form-control multiselect" name="trans_via[]" id="trans_via" multiple="multiple" data-include-select-all-option="true">
+                                <option value="onsite">Onsite</option>
+                                <option value="online">Online</option>
+                            </select>
+                        </div>
+                    </div>
+
+                    <div class="row mb-2">
+                        <label class="col-form-label col-lg-4">Status Reservasi</label>
+                        <div class="col-lg-8">
+                            <select class="form-control multiselect" name="reservation_status[]" id="reservation_status" multiple="multiple" data-include-select-all-option="true">
+                                <option value="aktif">Aktif</option>
+                                <option value="selesai">Selesai</option>
+                                <option value="cancel">Cancel</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-2">
+                        <label class="col-form-label col-lg-4">Status Pembayaran</label>
+                        <div class="col-lg-8">
+                            <select class="form-control multiselect" name="payment_status[]" id="payment_status" tabindex="-1" multiple="multiple" data-include-select-all-option="true">
+                                <option value="ditinjau">Ditinjau</option>
+                                <option value="paid">Paid</option>
+                                <option value="cancel">Cancel</option>
+                                <option value="expire">Kadaluarsa</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="row mb-2">
+                        <label class="col-form-label col-lg-4">Status Refund</label>
+                        <div class="col-lg-8">
+                            <select class="form-control multiselect" name="refund_status[]" id="refund_status" tabindex="-1" multiple="multiple" data-include-select-all-option="true">
+                                <option value="paid">Selesai</option>
+                                <option value="unpaid">Belum Selesai</option>
+                            </select>
+                        </div>
+                    </div>
+				</div>
+
+				<div class="modal-footer">
+					<button type="button" class="btn btn-link" data-bs-dismiss="modal">Tutup</button>
+					<button type="button" class="btn btn-indigo" onclick="setFilter()">Tampilkan</button>
+				</div>
+			</div>
+		</div>
+	</div>
 @endsection
 
 @section('page_js')
 <script>
     sidebar_collapsed();
     var tableData;
+    let filterActive = document.getElementById('filterActive');
+
     $(document).ready(function() {
+        $('.daterange-basic').daterangepicker({
+                parentEl: '.content-inner',
+            locale: {
+                format: 'YYYY-MM-DD', // Set the date format
+                cancelLabel: 'Clear',
+            }
+        });
+
+        $('.multiselect').multiselect();
+
+        initializeTable(false);
+
+        $('.dataTables_filter input').unbind();
+        $('.dataTables_filter input').bind('keyup', function (e) {
+            if (e.keyCode == 13) {
+                tableData.search(this.value).draw();
+            }
+        });
+
+        $('.btn_filter').on('click', function(){
+            tableData.draw();
+        });
+    });
+
+    function setFilter(){
+        if ($.fn.DataTable.isDataTable('.datatable-basic')) {
+            tableData.destroy();
+        }
+
+        initializeTable(true);
+        $('#filter').modal('hide');
+    }
+
+    function initializeTable(filter){
+        let xFilter;
+        if(filter === true){
+            console.log(filter);
+            xFilter = {
+                setFilter: true,
+                xPeriod: $('#tanggal').val(),
+                xTransVia: $('#trans_via').val(),
+                xReservationStatus: $('#reservation_status').val(),
+                xPaymentStatus: $('#payment_status').val(),
+            }
+        }else{
+            xFilter = {};
+        }
+
         tableData = $('.datatable-basic').DataTable({
             dom: '<"datatable-header"fl><"datatable-scroll"t><"datatable-footer"ip>',
             language: {
@@ -74,6 +205,9 @@
             },
             ajax: {
                 url: "{{ route('transaksi.cash-reservasi.index') }}",
+                data: function(d) {
+                    return $.extend({}, d, xFilter);
+                }
             },
             serverSide: true,
             processing: true,
@@ -126,6 +260,9 @@
                     class: 'text-end',
                     render: function(data, type, row) {
                         let display_commission = '';
+                        let extra_services = '';
+                        let refundAmount = '';
+
                         if(row.eo_id != null){
                             if(row.eo_commission_type == 'persentase'){
                                 display_commission = '<br> EO: ' + row.eo_commission + '% / ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.total_amount * row.eo_commission / 100);
@@ -133,20 +270,52 @@
                                 display_commission = '<br> EO: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.eo_commission * row.night_count);
                             }
                         }
-                        return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(data) + display_commission + '<br>Omzet: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.omzet);
+
+                        if(row.extra_bill !== null){
+                            extra_services = '<br> Ext: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.extra_bill);
+                        }
+
+                        if(row.refund !== null){
+                            refundAmount = '<br> RF: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.refund);
+                        }
+
+                        return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(data) + display_commission + '<br>Omzet: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.omzet) + extra_services + refundAmount;
                     }
                 },
                 {
-                    data: 'payment_status',
-                    class: 'text-center',
+                    data: null,
+                    orderable: false,
+                    sortable: false,
+                    searchable: false,
                     render: function(data, type, row) {
-                        let bg = '';
-                        if(data == 'paid') {
-                            bg = 'success';
+                        let bgPayment = '';
+                        let bgReservasi = '';
+                        let refund = '';
+                        let refundStatus = '';
+
+                        if(row.payment_status === 'paid') {
+                            bgPayment = 'success';
+                        }else if(row.payment_status === 'ditinjau'){
+                            bgPayment = 'warning';
                         }else{
-                            bg = 'danger';
+                            bgPayment = 'danger';
                         }
-                        return '<span class="badge bg-'+bg+' text-'+bg+' bg-opacity-20">'+data+'</span>';
+
+                        if(row.reservation_status === 'selesai') {
+                            bgReservasi = 'success';
+                        }else if(row.reservation_status === 'aktif'){
+                            bgReservasi = 'info';
+                        }else{
+                            bgReservasi = 'danger';
+                        }
+
+                        if(row.refund !== null){
+                            let refundStatus = (row.refund_status === null) ? 'Belum Selesai' : 'Selesai';
+                            refund = 'RF: <span class="badge bg-purple text-purple bg-opacity-20">'+refundStatus+'</span>';
+                        }
+
+                        return 'PY: <span class="badge bg-'+bgPayment+' text-'+bgPayment+' bg-opacity-20">'+row.payment_status+'</span><br>\
+                                RV: <span class="badge bg-'+bgReservasi+' text-'+bgReservasi+' bg-opacity-20">'+row.reservation_status+'</span><br>'+refund;
                     }
                 },
                 { data: 'actions', className: 'text-center', name: 'actions', orderable: false, searchable: false, sortable: false },
@@ -160,7 +329,7 @@
                 });
             },
             rowCallback: function(row, data, index) {
-                if (data.cancel_flag == 'Y') {
+                if (data.reservation_status == 'cancel') {
                     $(row).addClass('bg-danger bg-opacity-10 text-danger');
                 }
                 
@@ -169,18 +338,7 @@
                 }
             }
         });
-
-        $('.dataTables_filter input').unbind();
-        $('.dataTables_filter input').bind('keyup', function (e) {
-            if (e.keyCode == 13) {
-                tableData.search(this.value).draw();
-            }
-        });
-
-        $('.btn_filter').on('click', function(){
-            tableData.draw();
-        });
-    });
+    }
 
     function ucwords(str) {
         return str.toLowerCase().replace(/\b\w/g, function (char) {
@@ -202,6 +360,60 @@
 
         // Optionally, you can set content or perform other actions in the new window
         // newWindow.document.write('<h1>Hello, New Window!</h1>');
+    }
+
+    function finish_refund(id){
+        swalInit.fire({
+            title: 'Konfirmasi',
+            html: 'Apakah Anda yakin sudah menyelesaikan refund ini?',
+            type: 'warning',
+            icon: 'warning',
+            showCancelButton: true,
+            confirmButtonText: 'Iya, tolong selesaikan!',
+            cancelButtonText: 'Tidak, tolong batalkan!',
+            confirmButtonClass: 'btn btn-success',
+            cancelButtonClass: 'btn btn-danger',
+            buttonsStyling: false,
+            allowOutsideClick: false
+        }).then(function(result) {
+            if(result.value) {
+                $.ajax({
+                    url: "{{ route('transaksi.reservasi.finish_refund', ':id') }}".replace(':id', id),
+                    type: "PUT",
+                    data: {
+                        _token : "{{ csrf_token() }}",
+                        id : id
+                    },
+                    beforeSend: function(){
+                        // small_loader_open(selector);
+                    },
+                    success: function(d){
+                        swalInit.fire({
+                            title: d.msg_title,
+                            html: d.msg_body,
+                            type: 'success',
+                            icon: 'success',
+                            confirmButtonClass: 'btn btn-success',
+                        });
+                        reload_table(tableData)
+                    },
+                    complete: function(){
+                        // small_loader_close(selector);
+                    }
+                });
+            }
+            else if(result.dismiss === swalInit.DismissReason.cancel) {
+                swalInit.fire({
+                    title: 'Dibatalkan',
+                    html: 'Refund dibatalkan 😉',
+                    type: 'success',
+                    icon: 'success',
+                    confirmButtonClass: 'btn btn-success',
+                    allowOutsideClick: false
+                });
+                // small_loader_close(selector);
+            }
+        });
     }
 </script>
 @endsection
