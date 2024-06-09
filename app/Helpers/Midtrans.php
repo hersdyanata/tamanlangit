@@ -26,7 +26,7 @@ class Midtrans {
             $reservation = Reservations::with(['room', 'wahana'])->findOrFail($id);
             $payload = [
                 'transaction_details' => [
-                    'order_id'      => $reservation->id,
+                    'order_id'      => $reservation->trans_num,
                     'gross_amount'  => $reservation->total_amount,
                 ],
                 'customer_details' => [
@@ -86,7 +86,8 @@ class Midtrans {
         ])->get($this->getUrl."/v2/$id/status");
 
         $response = json_decode($post->body());
-        $order = Reservations::findOrFail($response->order_id);
+        // $order = Reservations::findOrFail($response->order_id);
+        $order = Reservations::where('trans_num', $response->order_id)->firstOrFail();
         if($order->payment_status === 'paid' || $order->payment_status === 'ditinjau'){
             return 'Payment has been done';
         }

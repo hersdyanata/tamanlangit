@@ -148,7 +148,7 @@
 <body>
     <div class="container">
         {{-- <img src="{{ asset('assets/images/taman_langit.png') }}" style="display: block; margin: 0 auto;"> --}}
-        <img src="https://reservasi.c-ss.co.id/assets/images/taman_langit.png" style="display: block; margin: 0 auto;">
+        <img src="https://demo.tamanlangitpangalengan.com/assets/images/taman_langit.png" style="display: block; margin: 0 auto;">
         <h1>Slip Reservasi</h1>
         <p>Halo {{ $data['name'] }},</p>
         <p>

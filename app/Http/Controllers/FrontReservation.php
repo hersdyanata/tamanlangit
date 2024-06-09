@@ -14,12 +14,14 @@ use Illuminate\Http\Request;
 use DB;
 use App\Models\Configuration;
 use App\Models\Reviews;
+use QrCode;
 
 class FrontReservation extends Controller
 {
     public function form_submit(Request $request)
     {
         $tanggal = explode(' - ', $request->reservation_date);
+        $ppn = Configuration::where('prefix', 'ppn')->pluck('value')->first();
         return view('frontends.reservation.form')
                 ->with([
                     'title' => 'Reservasi',
@@ -29,7 +31,7 @@ class FrontReservation extends Controller
                     'nights' => $request->nights,
                     'persons' => $request->person_quantity,
                     'tent' => $request->tent,
-                    'ppn' => 11,
+                    'ppn' => $ppn,
                 ]);
     }
 
@@ -71,9 +73,7 @@ class FrontReservation extends Controller
                     $coupon->save();
                 }
                 
-                // $reservation = Reservations::with(['room', 'wahana'])->find(58);
                 $payment = $midtrans->postCharge($header->id);
-                // $payment = $this->postToMidtrans($header->id);
                 if($payment){
                     $sendmail->reservation($request->email, $header->id);
                 }

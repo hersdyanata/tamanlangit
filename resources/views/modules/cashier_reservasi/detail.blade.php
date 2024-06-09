@@ -32,6 +32,14 @@
                         </span>
                         Batalkan
                     </button>
+                    @can('kasir-reservasi-delete')
+                        <button type="button" class="btn btn-danger btn-labeled btn-labeled-start" onclick="hapus()">
+                            <span class="btn-labeled-icon bg-black bg-opacity-20">
+                                <i class="ph-trash"></i>
+                            </span>
+                            Hapus
+                        </button>
+                    @endcan
                     @if ($data->payment_status === 'pending' && $data->trans_via === 'onsite')
                         <button type="button" class="btn btn-success btn-labeled btn-labeled-start" data-bs-toggle="modal" data-bs-target="#payment">
                             <span class="btn-labeled-icon bg-black bg-opacity-20">
@@ -171,15 +179,19 @@
 
         $refund = 0;
         $refundInfo = '';
-        if($data->payment_status === 'paid'){
-            if($daysDifference >= 3){
-                $rule = $cancelRules->where('parameter', 'more_than_3')->first();
-                $refund = $data->total_amount * ($rule->value / 100);
-                $refundInfo = 'Pembatalan ini dilakukan lebih dari H-3, refund kepada customer adalah sebesar 70% dari IDR '.number_format($data->total_amount).'. Yaitu IDR '. number_format($refund);
-            }else{
-                $rule = $cancelRules->where('parameter', 'less_than_3')->first();
-                $refund = 0;
-                $refundInfo = 'Pembatalan ini dilakukan kurang dari H-3, sehingga tidak ada refund kepada customer.';
+        if ($data->payment_status === 'paid') {
+            if ($currentDate < $reservedDate) {
+                if ($daysDifference >= 3) {
+                    $rule = $cancelRules->where('parameter', 'more_than_3')->first();
+                    $refund = $data->total_amount * ($rule->value / 100);
+                    $refundInfo = 'Pembatalan ini dilakukan lebih dari H-3, refund kepada customer adalah sebesar 70% dari IDR ' . number_format($data->total_amount) . '. Yaitu IDR ' . number_format($refund);
+                } else {
+                    $rule = $cancelRules->where('parameter', 'less_than_3')->first();
+                    $refund = 0;
+                    $refundInfo = 'Pembatalan ini dilakukan kurang dari H-3, sehingga tidak ada refund kepada customer.';
+                }
+            } else {
+                $refundInfo = 'Tanggal reservasi sudah lewat, tidak ada refund kepada customer.';
             }
         }
     @endphp
@@ -373,40 +385,60 @@
             }
         });
     }
+    
+    function hapus(){
+        swalInit.fire({
+                title: 'Konfirmasi',
+                html: 'Apakah Anda yakin akan menghapus data reservasi ini? ',
+                type: 'warning',
+                icon: 'warning',
+                showCancelButton: true,
+                confirmButtonText: 'Iya, tolong hapus!',
+                cancelButtonText: 'Tidak, biarkan saja!',
+                confirmButtonClass: 'btn btn-success',
+                cancelButtonClass: 'btn btn-danger',
+                buttonsStyling: false,
+                allowOutsideClick: false,
+        }).then(function(result) {
+            if(result.value) {
 
-    function printDiv() {
-        // Create a new window/tab
-        var newWindow = window.open('', '_blank');
+                $.ajax({
+                    url: "{{ route('transaksi.cash-reservasi.destroy', $data->id) }}",
+                    type: "DELETE",
+                    data: {
+                        _token : "{{ csrf_token() }}",
+                        id: {{ $data->id }},
+                    },
+                    beforeSend: function(){
+                        // small_loader_open(selector);
+                    },
+                    success: function(d){
+                        swalInit.fire({
+                            title: d.msg_title,
+                            html: d.msg_body,
+                            type: 'success',
+                            icon: 'success',
+                            confirmButtonClass: 'btn btn-success',
+                        });
+                    },
+                    complete: function(){
+                        // setTimeout(function() {
+                            window.location = "{{ route('transaksi.cash-reservasi.index') }}";
+                        // }, 3000);
+                    }
+                });
 
-        // Get the content of the div you want to print
-        var content = $('#divToPrint').html();
-
-        // Set the content of the new window/tab to the div content
-        newWindow.document.write('<html><head><title>Print</title>');
-        
-        // Create a link element for the CSS and set onload event
-        var cssLink = newWindow.document.createElement('link');
-        cssLink.href = "{{ asset('assets/css/ltr/all.min.css') }}"; // Replace with the actual path to your CSS file
-        cssLink.rel = 'stylesheet';
-        cssLink.type = 'text/css';
-        cssLink.onload = function () {
-            // CSS has been loaded, now add the content and print
-            newWindow.document.write('<body>' + content + '</body></html>');
-            
-            // Set the paper size to A4
-            newWindow.document.head.innerHTML += '<style>@page { size: A4; }</style>';
-            
-            // Print the content
-            newWindow.print();
-            
-            // Close the new window/tab after printing
-            newWindow.onafterprint = function () {
-                newWindow.close();
-            };
-        };
-
-        // Append the link element to the head
-        newWindow.document.head.appendChild(cssLink);
+            }else if(result.dismiss === swalInit.DismissReason.cancel) {
+                swalInit.fire({
+                    title: 'Tidak Jadi',
+                    html: 'Data reservasi ini aman 😉',
+                    type: 'success',
+                    icon: 'success',
+                    confirmButtonClass: 'btn btn-success',
+                    allowOutsideClick: false
+                });
+            }
+        });
     }
 </script>
 @endsection

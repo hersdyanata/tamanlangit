@@ -6,6 +6,7 @@ use Illuminate\Http\Request;
 use App\Models\Wahana;
 use App\Models\WahanaRoom;
 use App\Models\Reservations;
+use App\Models\ReservationExtraServices;
 use DB;
 use App\Models\Payments;
 use DataTables;
@@ -37,9 +38,9 @@ class TransReservasiOnsiteController extends Controller
         if ($request->ajax()) {
             if(!isset($request->dashboard)){
                 if(!isset($request->setFilter)){
-                    $data = Reservations::with(['payments', 'wahana', 'room'])->orderBy('created_at', 'desc')->get();
+                    $data = Reservations::with(['payments', 'wahana', 'room', 'eo'])->orderBy('created_at', 'desc')->get();
                 }else{
-                    $data = Reservations::with(['payments', 'wahana', 'room'])
+                    $data = Reservations::with(['payments', 'wahana', 'room', 'eo'])
                             ->when(request('xReservationStatus'), function($rec, $search){
                                 $rec->whereIn('reservation_status', $search);
                             })
@@ -70,7 +71,9 @@ class TransReservasiOnsiteController extends Controller
                     $btn .= '<button type="button" class="btn btn-sm btn-outline-info btn-icon tooltiped" title="Cetak Tiket" onclick="openReceipt('.$row->id.')">
                                 <i class="icon-ticket"></i>
                             </button> ';
-                    
+                }
+
+                if(auth()->user()->can('kasir-reservasi-edit')){
                     if($row->refund !== null){
                         $disableRefundButton = ($row->refund_status === 'selesai') ? 'disabled' : '';
                         $btn .= '<button type="button" class="btn btn-sm btn-outline-indigo btn-icon tooltiped" title="Selesaikan Refund" onclick="finish_refund('.$row->id.')" '.$disableRefundButton.'>
@@ -175,8 +178,8 @@ class TransReservasiOnsiteController extends Controller
                     'persons' => $request->persons,
                     'price' => str_replace('.', '', $request->price),
                     'subtotal' => str_replace('.', '', $request->subtotal),
-                    'ppn' => $request->ppn,
-                    'ppn_amount' => str_replace('.', '', $request->ppn_amount),
+                    'ppn' => ($request->has('toggle_ppn')) ? $request->ppn : 0,
+                    'ppn_amount' => ($request->has('toggle_ppn')) ? str_replace('.', '', $request->ppn_amount) : 0,
                     'total_amount' => str_replace('.', '', $request->total_amount),
                     'payment_status' => ($request->has('toggle_paylater')) ? 'pending' : 'paid',
                     'reservation_status' => 'aktif',
@@ -341,7 +344,7 @@ class TransReservasiOnsiteController extends Controller
         $data = Reservations::find($id);
         $data->reservation_status = 'cancel';
         $data->cancel_reason = $message;
-        $data->refund = $refund;
+        $data->refund = ($refund > 0) ? $refund : null;
         $data->omzet = $omzet;
 
         $room = WahanaRoom::find($data->room_id);
@@ -368,6 +371,16 @@ class TransReservasiOnsiteController extends Controller
      */
     public function destroy(string $id)
     {
-        //
+        $reservation = Reservations::find($id);
+        if ($reservation) {
+            $reservation->delete();
+            Payments::where('payment_for', 'reservation')->where('trans_id', $id)->delete();
+            ReservationExtraServices::where('reservation_id', $id)->delete();
+        }
+
+        return [
+            'msg_title' => 'Berhasil',
+            'msg_body' => 'Reservasi dengan nomor tiket <strong>#'.$reservation->trans_num.'</strong> sudah dihapus!',
+        ];    
     }
 }

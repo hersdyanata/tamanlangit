@@ -232,7 +232,7 @@
                                 </div>
                             </div>
 
-                            <button type="button" onclick="save()" class="mil-button mil-accent-1 mil-mb-10">
+                            <button type="button" onclick="save()" class="mil-button mil-accent-1 mil-mb-10 btn-launch-spinner" data-icon="ph-spinner">
                                 <svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-bookmark">
                                     <path d="M19 21l-7-5-7 5V5a2 2 0 0 1 2-2h10a2 2 0 0 1 2 2z"></path>
                                 </svg>
@@ -443,6 +443,10 @@
                 type: "POST",
                 url: "{{ route('reservasi.submit') }}",
                 data: $('#form_data').serialize(),
+                beforeSend: function() {
+                    $('.mil-button').prop('disabled', true);
+                    openLoader();
+                },
                 success: function (s) {
                     let redirectUrl = "{{ route('reservasi.make_payment', ':brew') }}".replace(':brew', s.id);
                     sw_success_redirect(s, redirectUrl);
@@ -456,7 +460,7 @@
                     // }
                 },
                 complete: function(){
-                    // small_loader_close('form_data');
+                    closeLoader();
                 }
             });
         }

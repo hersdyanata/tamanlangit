@@ -1,0 +1,146 @@
+/* .card-overlay {
+    position: absolute;
+    left: 0;
+    right: 0;
+    top: 0;
+    bottom: 0;
+    width: 100%;
+    height: 80%;
+    display: -ms-flexbox;
+    display: flex;
+    -ms-flex-align: center;
+    align-items: center;
+    -ms-flex-pack: center;
+    justify-content: center;
+    background-color: rgba(255, 255, 255, .75);
+    z-index: 1001;
+    -webkit-animation: cardOverlayEnter 0.15s ease;
+    animation: cardOverlayEnter 0.15s ease;
+    border-radius: 0.375rem;
+    color-scheme: #000;
+    background-color: rgba(0, 0, 0, .5);
+} */
+
+.card-overlay {
+    position: fixed; /* Mengubah dari absolute ke fixed */
+    top: 50%; /* Menempatkan elemen di tengah secara vertikal */
+    left: 50%; /* Menempatkan elemen di tengah secara horizontal */
+    transform: translate(-50%, -50%); /* Menyesuaikan posisi dengan transformasi */
+    width: 100%; /* Sesuaikan sesuai kebutuhan */
+    height: 100%; /* Sesuaikan sesuai kebutuhan */
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    background-color: rgba(0, 0, 0, .5); /* Menggunakan warna yang telah Anda tetapkan */
+    z-index: 1001;
+    -webkit-animation: cardOverlayEnter 0.15s ease;
+    animation: cardOverlayEnter 0.15s ease;
+    border-radius: 0.375rem;
+    color: #ffff; /* Mengubah dari color-scheme ke color */
+}
+
+
+.card-overlay-fadeout {
+    -webkit-animation: cardOverlayExit 0.15s ease;
+    animation: cardOverlayExit 0.15s ease
+}
+
+@-webkit-keyframes cardOverlayEnter {
+    0% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
+}
+
+@keyframes cardOverlayEnter {
+    0% {
+        opacity: 0
+    }
+
+    100% {
+        opacity: 1
+    }
+}
+
+@-webkit-keyframes cardOverlayExit {
+    0% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
+}
+
+@keyframes cardOverlayExit {
+    0% {
+        opacity: 1
+    }
+
+    100% {
+        opacity: 0
+    }
+}
+
+.spinner {
+    display: inline-block;
+    -webkit-animation: rotation 1s linear infinite;
+    animation: rotation 1s linear infinite
+}
+
+.spinner-reverse {
+    display: inline-block;
+    -webkit-animation: rotation_reverse 1s linear infinite;
+    animation: rotation_reverse 1s linear infinite
+}
+
+@-webkit-keyframes rotation {
+    0% {
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg)
+    }
+}
+
+@keyframes rotation {
+    0% {
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+    }
+
+    100% {
+        -webkit-transform: rotate(360deg);
+        transform: rotate(360deg)
+    }
+}
+
+@-webkit-keyframes rotation_reverse {
+    0% {
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+    }
+
+    100% {
+        -webkit-transform: rotate(-360deg);
+        transform: rotate(-360deg)
+    }
+}
+
+@keyframes rotation_reverse {
+    0% {
+        -webkit-transform: rotate(0);
+        transform: rotate(0)
+    }
+
+    100% {
+        -webkit-transform: rotate(-360deg);
+        transform: rotate(-360deg)
+    }
+}

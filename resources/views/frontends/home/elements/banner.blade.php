@@ -17,7 +17,7 @@
                         <div class="mil-suptitle mil-mb-40">Hi Guys! Mari Healing!😎</div>
                         <h1 class="mil-mb-40">Lebih dekat dengan alam <br>itu menyehatkan.</h1>
                         <div class="mil-search-panel mil-mb-20">
-                            <form>
+                            <form action="{{ route('wahana') }}" method="get">
                                 <div class="mil-form-grid">
                                     <div class="mil-col-5 mil-field-frame">
                                         <label>Check-in</label>

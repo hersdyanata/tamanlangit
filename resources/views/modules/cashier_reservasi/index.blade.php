@@ -48,20 +48,18 @@
             <span class="badge bg-info text-info bg-opacity-10">Didatangkan Oleh Event Organizer</span>
             <span class="badge bg-teal text-teal bg-opacity-10">PY: Status Pembayaran</span>
             <span class="badge bg-purple text-purple bg-opacity-10">RV: Status Reservasi</span>
-            <span class="badge bg-purple text-indigo bg-opacity-10">RF: Refund</span>
+            <span class="badge bg-purple text-indigo bg-opacity-10">RF: Status Refund</span>
 
             <table class="table datatable-basic table-xs table-hover" id="tableData">
                 <thead>
                     <tr class="table-border-double bg-teal bg-opacity-20">
                         <th class="text-center">#</th>
-                        <th>No. Transaksi</th>
-                        <th>Via</th>
-                        <th>Tgl. Reservasi</th>
-                        <th>Checkin/out</th>
-                        <th>Peserta</th>
-                        <th>Wahana & Tenda</th>
-                        <th>PPn</th>
-                        <th>Total Amount</th>
+                        <th>Reservasi</th>
+                        <th>Tgl. Booking</th>
+                        <th>Pemesan</th>
+                        <th>Paket</th>
+                        <th>Tagihan</th>
+                        <th>Omzet</th>
                         <th>Status</th>
                         <th class="text-center">Actions</th>
                     </tr>
@@ -216,70 +214,53 @@
                 {
                     data: 'a_tiket',
                     render: function(data, type, row) {
-                        return data + '<br>' + moment(row.created_at).format('DD.MM.YYYY HH:mm');
+                        return 'Tiket: ' + data + '<br> Tgl Pesan: ' + moment(row.created_at).format('DD.MM.YYYY HH:mm') + '<br> Via: ' + row.trans_via;
                     }
                 },
-                { data: 'trans_via', name: 'trans_via', orderable: true, searchable: true, sortable: true },
                 {
                     data: 'start_date',
                     render: function(data, type, row) {
-                        return 'Mulai: ' + moment(data).format('DD.MM.YYYY') + '<br>' + 
-                               'Sampai: ' + moment(row.end_date).format('DD.MM.YYYY');
-                    }
-                },
-                {
-                    data: 'checkin_date',
-                    render: function(data, type, row) {
                         let in_date = (row.checkin_date != null) ? moment(data).format('DD.MM.YYYY HH:mm') : '<code>-</code>';
                         let out_date = (row.checkout_date != null) ? moment(data).format('DD.MM.YYYY HH:mm') : '<code>-</code>';
-                        return 'Check-In: ' + in_date + '<br>' +
-                               'Check-Out: ' + out_date;
+                        
+                        return 'Mulai: ' + moment(data).format('DD.MM.YYYY') + '<br>' + 
+                               'Sampai: ' + moment(row.end_date).format('DD.MM.YYYY') + '<br> Check-in: ' + in_date + '<br>' + 'Check-out: ' + out_date;
                     }
                 },
                 {
-                    data: 'persons',
+                    data: 'name',
                     render: function(data, type, row) {
-                        return data + ' Orang';
+                        return 'Nama: ' + data + '<br> WA: ' + row.wa_number + '<br> Email: ' + row.email;
                     }
                 },
                 {
                     data: 'wahana.name',
                     render: function(data, type, row) {
-                        return ucwords(data) + ' / ' + row.room.name + '<br> Harga: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.price) + ' x ' + row.night_count + ' malam';
+                        return ucwords(data) + ' / ' + row.room.name + '<br> Harga: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.price) + ' x ' + row.night_count + ' malam <br> Anggota: ' + row.persons + ' Orang';
                     }
                 },
                 {
-                    data: 'ppn',
-                    class: 'text-end',
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
                     render: function(data, type, row) {
-                        return (data != null ) ? data + '% <br>' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.ppn_amount) : '<code>-</code>';
+                        let displayPpn = (row.ppn !== 0 ? row.ppn + '% (' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.ppn_amount) + ')' : '<code>-</code>');
+                        let displayDiscount = (row.coupon_id !== null ? '-'+ new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.discount_amount) : '<code>-</code>');
+
+                        return 'Subtotal: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.subtotal) + '<br> PPn: ' + displayPpn + '<br> Diskon: ' + displayDiscount + '<br> Total: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.total_amount);
                     }
                 },
                 {
-                    data: 'total_amount',
-                    class: 'text-end',
+                    data: null,
+                    orderable: false,
+                    searchable: false,
+                    sortable: false,
                     render: function(data, type, row) {
-                        let display_commission = '';
-                        let extra_services = '';
-                        let refundAmount = '';
+                        let displayEo = 'EO: ' + (row.eo_id !== null ? '-' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.eo_total_commission) + ' (' + row.eo.name + ')' : '<code>-</code>');
+                        let displayRefund = '<br>Refund: ' + (row.refund != null ? '-' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.refund) : '<code>-</code>');
 
-                        if(row.eo_id != null){
-                            if(row.eo_commission_type == 'persentase'){
-                                display_commission = '<br> EO: ' + row.eo_commission + '% / ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.total_amount * row.eo_commission / 100);
-                            }else{
-                                display_commission = '<br> EO: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.eo_commission * row.night_count);
-                            }
-                        }
-
-                        if(row.extra_bill !== null){
-                            extra_services = '<br> Ext: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.extra_bill);
-                        }
-
-                        if(row.refund !== null){
-                            refundAmount = '<br> RF: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.refund);
-                        }
-
-                        return new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(data) + display_commission + '<br>Omzet: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.omzet) + extra_services + refundAmount;
+                        return displayEo + displayRefund + '<br> Omzet: ' + new Intl.NumberFormat('id-ID', { maximumFractionDigits: 2 }).format(row.omzet);
                     }
                 },
                 {

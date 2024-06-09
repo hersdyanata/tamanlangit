@@ -8,37 +8,12 @@ Body
 }
 
 body {
-  height: 100vh;
+  height: 90vh;
   margin: 0;
   background: #999;
   color: #363c44;
   font-size: 14px;
   font-family: "Roboto", sans-serif;
-}
-
-/* Print specific styles */
-@media print {
-  body {
-    background: #fff;
-    margin: 0;
-    padding: 0;
-  }
-
-  .boarding-pass {
-    margin: 0;
-    width: 100%;
-    height: auto;
-    border: none;
-    box-shadow: none;
-    transform: none;
-    top: 0;
-    left: 0;
-    page-break-inside: avoid;
-  }
-
-  .no-print {
-    display: none;
-  }
 }
 
 /*--------------------
@@ -53,13 +28,26 @@ Boarding Pass
   height: 600px;
   background: #fff;
   border-radius: 12px;
+  /* box-shadow: 0 5px 30px rgba(0, 0, 0, 0.2); */
   overflow: hidden;
   text-transform: uppercase;
+  /*--------------------
+  Header
+  --------------------*/
+  /*--------------------
+  Cities
+  --------------------*/
+  /*--------------------
+  Infos
+  --------------------*/
+  /*--------------------
+  Strap
+  --------------------*/
 }
 .boarding-pass small {
   display: block;
   font-size: 11px;
-  color: #000;
+  color: #A2A9B3;
   margin-bottom: 2px;
 }
 .boarding-pass strong {
@@ -112,12 +100,10 @@ Boarding Pass
   font-size: 25px;
   font-weight: 300;
   line-height: 1.3;
-  color: #000;
 }
 .boarding-pass .cities .city small {
   margin-bottom: 0px;
   margin-left: 3px;
-  color: #000;
 }
 .boarding-pass .cities .airplane {
   position: absolute;
@@ -165,21 +151,19 @@ Boarding Pass
   display: table;
   clear: both;
 }
-
 .boarding-pass .infos .times strong {
   transform: scale(0.9);
   transform-origin: left bottom;
-  color: #000;
 }
 .boarding-pass .infos .places {
-  background: #FFFF;
+  background: #ECECEC;
   border-right: 1px solid #99D298;
 }
 .boarding-pass .infos .places small {
-  color: #000;
+  color: #97A1AD;
 }
 .boarding-pass .infos .places strong {
-  color: #000;
+  color: #239422;
 }
 .boarding-pass .infos .box {
   padding: 10px 20px 10px;
@@ -201,11 +185,11 @@ Boarding Pass
   clear: both;
 }
 .boarding-pass .strap .box {
+  /* padding: 15px 0 60px 15px; */
   padding: 15px 0 -1px 15px;
   margin-left: 15px;
   margin-top: 15px;
   width: 60%;
-  color: #000;
 }
 .boarding-pass .strap .box div {
   margin-bottom: 8px;

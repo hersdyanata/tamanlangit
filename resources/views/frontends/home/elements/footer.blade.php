@@ -1,5 +1,5 @@
 <footer>
-    <img src="{{ asset('assets/fe/img/shapes/4.png') }}" class="mil-shape mil-fade-up" style="width: 85%; top: -15%; left: -40%; transform: rotate(-50deg)" alt="shape">
+    {{-- <img src="{{ asset('assets/fe/img/shapes/4.png') }}" class="mil-shape mil-fade-up" style="width: 85%; top: -15%; left: -40%; z-index:-9999; transform: rotate(-50deg)" alt="shape"> --}}
     <div class="mil-footer-content mil-fade-up">
         <div class="container">
             <div class="row justify-content-between mil-p-100-40">
