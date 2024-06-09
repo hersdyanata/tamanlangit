@@ -440,5 +440,40 @@
             }
         });
     }
+
+    function printDiv() {
+        // Create a new window/tab
+        var newWindow = window.open('', '_blank');
+
+        // Get the content of the div you want to print
+        var content = $('#divToPrint').html();
+
+        // Set the content of the new window/tab to the div content
+        newWindow.document.write('<html><head><title>Print</title>');
+        
+        // Create a link element for the CSS and set onload event
+        var cssLink = newWindow.document.createElement('link');
+        cssLink.href = "{{ asset('assets/css/ltr/all.min.css') }}"; // Replace with the actual path to your CSS file
+        cssLink.rel = 'stylesheet';
+        cssLink.type = 'text/css';
+        cssLink.onload = function () {
+            // CSS has been loaded, now add the content and print
+            newWindow.document.write('<body>' + content + '</body></html>');
+            
+            // Set the paper size to A4
+            newWindow.document.head.innerHTML += '<style>@page { size: A4; }</style>';
+            
+            // Print the content
+            newWindow.print();
+            
+            // Close the new window/tab after printing
+            newWindow.onafterprint = function () {
+                newWindow.close();
+            };
+        };
+
+        // Append the link element to the head
+        newWindow.document.head.appendChild(cssLink);
+    }
 </script>
 @endsection
