@@ -56,29 +56,47 @@
                 $interval = $currentDate->diff($reservedDate);
                 $daysDifference = $interval->days;
 
-                if($daysDifference >= 3){
-                    $rule = $cancelRules->where('parameter', 'more_than_3')->first();
-                    $refund = $data->total_amount * ($rule->value / 100);
+                if ($currentDate < $reservedDate) {
+                    if($daysDifference >= 3){
+                        $rule = $cancelRules->where('parameter', 'more_than_3')->first();
+                        $refund = $data->total_amount * ($rule->value / 100);
+                    }else{
+                        $rule = $cancelRules->where('parameter', 'less_than_3')->first();
+                        $refund = 0;
+                    }
                 }else{
-                    $rule = $cancelRules->where('parameter', 'less_than_3')->first();
                     $refund = 0;
+                    $rule = null;
                 }
             @endphp
             <div class="row align-items-center justify-content-center">
                 <div class="col-xl-8">
                     <div class="mil-iconbox mil-mb-40-adapt mil-fade-up mil-text-center">
                         @if ($data->payment_status === 'paid')
-                            @if ($daysDifference >= 3)
-                                <p class="mil-mb-20">
-                                    Nomor tiket kamu #{{ $data->trans_num }}<br>
-                                    Tanggal reservasi: {{ date('Y-m-d', strtotime($data->start_date)) }} sd. {{ date('Y-m-d', strtotime($data->end_date)) }}<br>
-                                    Status pembayaran: Lunas / IDR {{ number_format($data->total_amount) }}<br>
-                                    Dana refund: IDR {{ number_format($refund) }}
-                                </p>
-                                <p class="mil-mb-20">
-                                    Sesuai aturan yang berlaku saat ini, karena kamu membatalkan lebih dari 3 hari sebelum tanggal reservasi yang kamu tentukan, maka kami akan mengembalikan {{ $rule->value }}% dari pembayaran yang sudah kamu selesaikan sebelumnya.<br>
-                                    Sedih sih 😞 tapi setidaknya beri tau kami alasan kamu ya 🙏🏻
-                                </p>                            
+                            @if($currentDate < $reservedDate)
+                                @if ($daysDifference >= 3)
+                                    <p class="mil-mb-20">
+                                        Nomor tiket kamu #{{ $data->trans_num }}<br>
+                                        Tanggal reservasi: {{ date('Y-m-d', strtotime($data->start_date)) }} sd. {{ date('Y-m-d', strtotime($data->end_date)) }}<br>
+                                        Status pembayaran: Lunas / IDR {{ number_format($data->total_amount) }}<br>
+                                        Dana refund: IDR {{ number_format($refund) }}
+                                    </p>
+                                    <p class="mil-mb-20">
+                                        Sesuai aturan yang berlaku saat ini, karena kamu membatalkan lebih dari 3 hari sebelum tanggal reservasi yang kamu tentukan, maka kami akan mengembalikan {{ $rule->value }}% dari pembayaran yang sudah kamu selesaikan sebelumnya.<br>
+                                        Sedih sih 😞 tapi setidaknya beri tau kami alasan kamu ya 🙏🏻
+                                    </p>                            
+                                @else
+                                    <p class="mil-mb-20">
+                                        Nomor tiket kamu #{{ $data->trans_num }}<br>
+                                        Tanggal check-in: {{ date('Y-m-d', strtotime($data->start_date)) }}<br>
+                                        Status pembayaran: Lunas / IDR {{ number_format($data->total_amount) }}<br>
+                                        Dana refund: -
+                                    </p>
+                                    <p class="mil-mb-20">
+                                        Sesuai aturan yang berlaku saat ini, karena kamu membatalkan lebih dari 3 hari sebelum tanggal reservasi yang kamu tentukan, maka kami akan mengembalikan {{ $rule->value }}% dari pembayaran yang sudah kamu selesaikan sebelumnya.<br>
+                                        Sedih sih 😞 tapi setidaknya beri tau kami alasan kamu ya 🙏🏻
+                                    </p>
+                                @endif
                             @else
                                 <p class="mil-mb-20">
                                     Nomor tiket kamu #{{ $data->trans_num }}<br>
@@ -87,7 +105,7 @@
                                     Dana refund: -
                                 </p>
                                 <p class="mil-mb-20">
-                                    Sesuai aturan yang berlaku saat ini, karena kamu membatalkan lebih dari 3 hari sebelum tanggal reservasi yang kamu tentukan, maka kami akan mengembalikan {{ $rule->value }}% dari pembayaran yang sudah kamu selesaikan sebelumnya.<br>
+                                    Sesuai aturan yang berlaku saat ini, karena kamu membatalkan sudah lewat dari tanggal reservasi, maka tidak ada data refund yang akan dikembalikan.<br>
                                     Sedih sih 😞 tapi setidaknya beri tau kami alasan kamu ya 🙏🏻
                                 </p>
                             @endif

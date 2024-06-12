@@ -142,6 +142,10 @@ class FrontReservation extends Controller
     public function cancel($id)
     {
         $data = Reservations::with(['payments', 'wahana', 'room'])->find(Crypt::decryptString($id));
+        if(!isset($data)){
+            abort(404);
+        }
+        
         if($data->reservation_status != 'aktif'){
             abort(404);
         }
@@ -160,7 +164,7 @@ class FrontReservation extends Controller
             DB::beginTransaction();
                 $data = Reservations::find($request->id);
                 if($request->payment_status === 'paid'){
-                    $data->refund = $request->refund;
+                    $data->refund = ($request->refund > 0 ? $request->refund : null);
                     $data->omzet = $request->omzet;
                     $data->reservation_status = 'cancel';
                     $data->cancel_reason = $request->cancel_reason;

@@ -98,6 +98,9 @@
     });
 
     function save(){
+        // if($('#keywords').val() === '' || $('#ckeditor_classic_prefilled').val() === '' || $('#title').val() === ''){
+        //     sw_error("'dt':{'msg_body':'Silahkan lengkapi form'}");
+        // }
         $.ajax({
             type: "PUT",
             url: "{{ route('cms.update', $cms->id) }}",
@@ -110,7 +113,7 @@
                 // sw_success(s);
             },
             error: function(e){
-                sw_multi_error(e);
+                sw_single_error(e);
                 // small_loader_close('form_data');
             },
             complete: function(){

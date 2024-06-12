@@ -240,7 +240,7 @@
                     </div>
 
                     <div class="d-flex align-items-center">
-                        <button type="button" class="btn btn-primary btn-labeled btn-labeled-start" onclick="save()">
+                        <button type="button" class="btn btn-primary btn-labeled btn-labeled-start" id="btnSave" onclick="save()">
                             <span class="btn-labeled-icon bg-black bg-opacity-20">
                                 <i class="ph-floppy-disk"></i>
                             </span>
@@ -620,13 +620,15 @@
     }
 
     function save(){
+        let btnSave = document.getElementById('btnSave');
         $.ajax({
             type: "POST",
             url: "{{ route('transaksi.cash-reservasi.store') }}",
             data: $('#form_data').serialize(),
-            // beforeSend: function(){
-            //     small_loader_open('form_data');
-            // },
+            beforeSend: function(){
+                // small_loader_open('form_data');
+                btnSave.disabled = true;
+            },
             success: function (s) {
                 // console.log(s);
                 // sw_success_redirect(s, "{{ route('transaksi.cash-inventory.index') }}");
@@ -650,11 +652,10 @@
                 $('#split_pay').html('');
                 $('#room_id').empty();
                 $('#room_id').append('<option value="">-- Tenda --</option>');
+                
+                $('#wahana_id').empty();
+                $('#wahana_id').append('<option value="">-- Pilih Wahana --</option>');
 
-                $('#payment_method').val('cash').trigger('change');
-                $('#split_pay').html('');
-                $('#room_id').empty();
-                $('#room_id').append('<option value="">-- Tenda --</option>');
             },
             error: function(e){
                 sw_multi_error(e);
@@ -662,6 +663,7 @@
             },
             complete: function(){
                 // small_loader_close('form_data');
+                btnSave.disabled = false;
             }
         });
     }

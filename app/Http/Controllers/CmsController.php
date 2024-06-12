@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Illuminate\Http\Request;
 use App\Models\Articles;
+use DB;
 
 class CmsController extends Controller
 {
@@ -45,11 +46,22 @@ class CmsController extends Controller
 
     public function update(Request $request, string $id)
     {
-        $cms = Articles::find($id);
-        $cms->title = $request->title;
-        $cms->content = $request->content;
-        $cms->keywords = $request->keywords;
-        $cms->save();
+        try {
+            DB::beginTransaction();
+                $cms = Articles::find($id);
+                $cms->title = $request->title;
+                $cms->content = $request->content;
+                $cms->keywords = $request->keywords;
+                $cms->save();
+            DB::commit();
+        } catch (\Exception $e){
+            DB::rollback();
+
+            return response()->json([
+                'msg_title' => 'Gagal!',
+                'msg_body' => $e->getMessage()
+            ], 400);
+        }
 
         return response()->json([
             'msg_title' => 'Berhasil',

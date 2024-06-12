@@ -22,6 +22,25 @@
             .star-review {
                 color: rgb(259, 245, 28);
             }
+
+            .wab{
+                position:fixed;
+                width:60px;
+                height:60px;
+                bottom:40px;
+                right:40px;
+                background-color:#25d366;
+                color:#FFF;
+                border-radius:50px;
+                text-align:center;
+                font-size:30px;
+                box-shadow: 2px 2px 3px #999;
+                z-index:9999;
+            }
+
+            .wab-float{
+                margin-top:16px;
+            }
         </style>
 
     </head>
@@ -47,6 +66,13 @@
             @include('frontends.home.elements.footer')
             @include('frontends.home.elements.book_popup')
 
+            @php
+                $contact = getContact();
+            @endphp
+            
+            <a href="https://wa.me/{{ $contact->mobile_number }}" class="wab" target="_blank">
+                <i class="ph-whatsapp-logo ph-2x wab-float"></i>
+            </a>
         </div>
 
         <script src="{{ asset('assets/fe/js/plugins/jquery.min.js') }}"></script>
@@ -59,63 +85,6 @@
         @yield('page_js')
 
         <script>
-            // const Progress = function() {
-            //     const _componentOverlay = function() {
-            //         // Elements
-            //         // Change button.getAttribute('data-icon') to your desired icon here. Current
-            //         // config is for demo. Or use this code if you wish
-            //         const buttonClass = 'btn-launch-spinner',
-            //             containerClass = 'mil-wrapper',
-            //             containerClass2 = 'mil-info',
-            //             overlayClass = 'card-overlay',
-            //             overlayAnimationClass = 'card-overlay-fadeout';
-
-            //         // Configure
-            //         document.querySelectorAll(`.${buttonClass}`).forEach(function(button) {
-            //             button.addEventListener('click', function(e) {
-            //                 e.preventDefault();
-            //                 console.log('clicked nih');
-
-            //                 // Elements
-            //                 const parentContainer = button.closest(`.${containerClass}`),
-            //                     overlayElement = document.createElement('div'),
-            //                     overlayElementIcon = document.createElement('span');
-
-            //                 // Append overlay with icon
-            //                 overlayElement.classList.add(overlayClass);
-            //                 parentContainer.appendChild(overlayElement);
-            //                 if(button.getAttribute('data-spin') == 'false') {
-            //                     overlayElementIcon.classList.add(button.getAttribute('data-icon'));
-            //                 }
-            //                 else {
-            //                     overlayElementIcon.classList.add(button.getAttribute('data-icon'), 'spinner', 'ph-5x');
-            //                 }
-            //                 overlayElement.appendChild(overlayElementIcon);
-
-            //                 // Remove overlay after 2.5s, for demo only
-            //                 setTimeout(function() {
-            //                     overlayElement.classList.add(overlayAnimationClass);
-            //                     ['animationend', 'animationcancel'].forEach(function(e) {
-            //                         overlayElement.addEventListener(e, function() {
-            //                             overlayElement.remove();
-            //                         });
-            //                     });
-            //                 }, 2500);
-            //             });
-            //         });
-            //     };
-
-            //     return {
-            //         init: function() {
-            //             _componentOverlay();
-            //         }
-            //     }
-            // }();
-
-            // document.addEventListener('DOMContentLoaded', function() {
-            //     Progress.init();
-            // });
-
             let buttonClass = 'btn-launch-spinner';
             let containerClass = 'mil-wrapper';
             let containerClass2 = 'mil-info';
