@@ -96,7 +96,7 @@
                 </div>
                 <div class="parkir">
                     {{-- <small>Tiket ini sudah termasuk parkir.</small> --}}
-                    <strong>*) Tiket ini sudah termasuk parkir.</strong>
+                    {{-- <strong>*) Tiket ini sudah termasuk parkir.</strong> --}}
                 </div>
             </div>
             <svg class="qrcode">

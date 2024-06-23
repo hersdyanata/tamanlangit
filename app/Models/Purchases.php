@@ -54,8 +54,8 @@ class Purchases extends Model
 
         // If there is a previous transaction, check if it's in the same month
         if ($lastTransaction) {
-            $lastTransactionYear = substr($lastTransaction->trans_num, 1, 2);
-            $lastTransactionMonth = substr($lastTransaction->trans_num, 3, 2);
+            $lastTransactionYear = substr($lastTransaction->trans_num, 0, 2);
+            $lastTransactionMonth = substr($lastTransaction->trans_num, 2, 2);
 
             if ($lastTransactionYear == $currentYear && $lastTransactionMonth == $currentMonth) {
                 // If in the same month, increment the transaction number
@@ -77,4 +77,5 @@ class Purchases extends Model
 
         return $uniqueCode;
     }
+
 }
