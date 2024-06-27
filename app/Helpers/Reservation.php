@@ -46,20 +46,27 @@ class Reservation {
         }
     }
     
-    public function checkCoupon($wahana_id, $code){
-        $kupon = Coupons::with(['wahanas'])
-                ->where('code', '#'.$code)
-                ->where('valid_for', 'online')
-                ->orWhere('valid_for', 'both')
-                ->first();
-        
-        if(isset($kupon)){
-            $wahanaFound = false;
-            if(isset($kupon) && count($kupon->wahanas) > 0){
-                $wahanaFound = in_array($wahana_id, array_column($kupon->wahanas->toArray(), 'wahana_id'));
-            }
+    public function checkCoupon($wahana_id, $validFor, $code){
+        $kupon = Coupons::with(['wahanas' => function($query) use ($wahana_id) {
+                    $query->where('wahana_id', $wahana_id);
+                }])->where(function($query) use ($validFor, $code) {
+                    $query->where('valid_for', $validFor)
+                        ->orWhere('valid_for', 'both');
 
-            if($kupon->status == 'A' && $wahanaFound == true){
+                    if ($validFor === 'onsite') {
+                        $query->where('id', $code);
+                    } else {
+                        $query->where('code', '#'.$code);
+                    }
+                })->where('status', 'A')
+                ->where('quantity', '>', 0)
+                ->first();
+
+        // dd($kupon);
+        
+        if($kupon){
+            $wahanaFound = $kupon->wahanas->isNotEmpty();
+            if($wahanaFound){
                 $isActive = true;
                 $msg_title = 'Berhasil';
                 $msg_body = 'Selamat! Diskon masih berlaku.';

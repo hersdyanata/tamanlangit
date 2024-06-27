@@ -55,6 +55,7 @@ class ReservationExport implements FromCollection, WithMapping, WithHeadings, Wi
         return[
             $data->trans_num,
             $data->start_date,
+            $data->name,
             $data->trans_via,
             $data->reservation_status,
             $data->payment_status,
@@ -77,6 +78,7 @@ class ReservationExport implements FromCollection, WithMapping, WithHeadings, Wi
     {
         return ['Nomor Tiket',
                 'Tanggal',
+                'Nama',
                 'Via',
                 'Status Reservasi',
                 'Status Pembayaran',
@@ -102,6 +104,7 @@ class ReservationExport implements FromCollection, WithMapping, WithHeadings, Wi
                 $event->sheet->append([
                     '', // start_date
                     '', // trans_via
+                    '', // nama
                     '', // reservation status
                     '', // payment_status
                     '', // wahana_name

@@ -112,7 +112,11 @@ class TransReservasiOnsiteController extends Controller
         //     return Coupons::where(['status' => 'A', 'valid_for' => 'both'])->orWhere('valid_for', 'onsite')->get();
         // });
 
-        $coupons = Coupons::where(['status' => 'A', 'valid_for' => 'both'])->orWhere('valid_for', 'onsite')->get();
+        $coupons = Coupons::with(['wahanas'])->where(function($query) {
+                        $query->where('valid_for', 'onsite')
+                            ->orWhere('valid_for', 'both');
+                    })->where('status', 'A')
+                    ->get();
 
         return view('modules.cashier_reservasi.create')
                 ->with([
@@ -130,10 +134,16 @@ class TransReservasiOnsiteController extends Controller
             return Wahana::with(['rooms'])->get();
         });
 
-        $coupons = Cache::remember('dropdown_coupon', 300, function () {
-            return Coupons::where(['status' => 'A', 'valid_for' => 'both'])->orWhere('valid_for', 'onsite')->get();
-        });
+        // $coupons = Cache::remember('dropdown_coupon', 300, function () {
+        //     return Coupons::where(['status' => 'A', 'valid_for' => 'both'])->orWhere('valid_for', 'onsite')->get();
+        // });
 
+        $coupons = Coupons::with(['wahanas'])->where(function($query) {
+                        $query->where('valid_for', 'onsite')
+                            ->orWhere('valid_for', 'both');
+                    })->where('status', 'A')
+                    ->get();
+        
         return view('modules.cashier_reservasi.create')
                 ->with([
                     'title' => 'Reservasi On-Site',

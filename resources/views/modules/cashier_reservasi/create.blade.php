@@ -146,20 +146,10 @@
                         <label class="col-form-label col-lg-2 fw-bold">Diskon</label>
                         <div class="col-lg-5">
                             <select class="form-control select" name="coupon_id" id="coupon_id">
-                                <option value=""
-                                        data-quantity="" 
-                                        data-discount-type=""
-                                        data-discount-value=""
-                                        data-valid-for=""
-                                        data-wahana="">-- Pilih Kupon --</option>
-                                @foreach ($coupons as $coupon)
-                                    <option value="{{ $coupon->id }}" 
-                                            data-quantity="{{ $coupon->balance }}" 
-                                            data-discount-type="{{ $coupon->discount_type }}"
-                                            data-discount-value="{{ $coupon->discount }}"
-                                            data-valid-for="{{ $coupon->valid_for }}"
-                                            data-wahana="{{ json_encode($coupon->wahanas) }}">{{ $coupon->code }}</option>
-                                @endforeach
+                                <option value="">-- Pilih Kupon --</option>
+                                    @foreach ($coupons as $coupon)
+                                        <option value="{{ $coupon->id }}">{{ $coupon->code }}</option>
+                                    @endforeach
                             </select>
                         </div>
                         <div class="col-lg-2">
@@ -344,16 +334,21 @@
 
         document.getElementById('toggle_coupon').addEventListener('change', function() {
             if(this.checked) {
-                inputCoupon.disabled = false;
-                inputDiscount.disabled = false;
-                inputDiscountType.disabled = false;
-                inputDiscountAmount.disabled = false;
-
-                console.log('inputDiscountAmount 1: ', inputDiscountAmount.value);
-                if(inputDiscountAmount.value != ''){
-                    console.log('crot');
-                    updateDiscount();
-                    updateTotalTagihan();
+                if($('#wahana_id').val() != ''){
+                    inputCoupon.disabled = false;
+                    inputDiscount.disabled = false;
+                    inputDiscountType.disabled = false;
+                    inputDiscountAmount.disabled = false;
+                }else{
+                    this.checked = false;
+                    swalInit.fire({
+                        title: 'Paket Wahana Kosong',
+                        html: 'Silahkan pilih paket wahana terlebih dahulu',
+                        type: 'error',
+                        icon: 'error',
+                        confirmButtonClass: 'btn btn-danger',
+                        allowOutsideClick: false
+                    });
                 }
             }else{
                 $('#coupon_id').val(null).trigger('change');
@@ -366,22 +361,82 @@
                 inputDiscount.value = null;
                 inputDiscountAmount.value = null;
 
-
                 updateDiscount();
                 updateTotalTagihan();
             }
-        });
-
-        $('#coupon_id').on('change', function() {
-            let couponSelected = $(this).find('option:selected');
-            let discountType = couponSelected.data('discount-type');
-            let discount = couponSelected.data('discount-value');
-
-            inputDiscountType.value = discountType;
-            inputDiscount.value = discount;
 
             updateDiscount();
             updateTotalTagihan();
+        });
+
+        $('#coupon_id').on('change', function() {
+            // let couponSelected = $(this).find('option:selected');
+            // let discountType = couponSelected.data('discount-type');
+            // let discount = couponSelected.data('discount-value');
+            // let validWahana = couponSelected.data('wahana');
+
+            // // Parse the validWahana if it is a JSON string
+            // if (typeof validWahana === 'string') {
+            //     validWahana = JSON.parse(validWahana);
+            // }
+
+            // console.log(validWahana);
+            // inputDiscountType.value = discountType;
+            // inputDiscount.value = discount;
+
+            // let chosenWahana = $('#wahana_id').val();
+            // let wahanaFound = Array.isArray(validWahana) && validWahana.some(function(wahana) {
+            //     return wahana.wahana_id == chosenWahana;
+            // });
+
+            // if(!wahanaFound){
+            //     swalInit.fire({
+            //         title: 'Kupon Tidak Berlaku',
+            //         html: 'Kupon ini tidak berlaku untuk wahana yang dipilih',
+            //         type: 'error',
+            //         icon: 'error',
+            //         confirmButtonClass: 'btn btn-danger',
+            //         allowOutsideClick: false
+            //     });
+
+            //     inputDiscountType.value = null;
+            //     inputDiscount.value = null;
+            //     inputDiscountAmount.value = null;
+            //     $('#coupon_id').val(null).trigger('change');
+            //     return;
+            // }else{
+            //     updateDiscount();
+            //     updateTotalTagihan();
+            // }
+
+            $.ajax({
+                type: "GET",
+                url: "{{ route('reservasi.coupon', [':wahana', 'onsite', ':code']) }}".replace(':wahana', $('#wahana_id').val()).replace(':code', $('#coupon_id').val()),
+                success: function (s) {
+                    if(s.isActive == false){
+                        // sw_error(s);
+                        swalInit.fire({
+                            title: s.msg_title,
+                            html: s.msg_body,
+                            type: 'error',
+                            icon: 'error',
+                            confirmButtonClass: 'btn btn-danger',
+                            allowOutsideClick: false
+                        });
+                    }else{
+                        sw_success(s);
+
+                        inputDiscountType.value = s.coupon.discount_type;
+                        inputDiscount.value = s.coupon.discount;
+
+                        updateDiscount();
+                        updateTotalTagihan();
+                    }
+                },
+                complete: function(){
+
+                }
+            });
         });
 
         $('#room_id').on('change', function() {

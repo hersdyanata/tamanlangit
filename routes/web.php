@@ -31,7 +31,7 @@ Route::get('/blog/kategori/{url}', [App\Http\Controllers\FrontPageController::cl
 Route::get('/blog/kategori/{url_category}/{url}', [App\Http\Controllers\FrontPageController::class, 'post'])->name('post');
 
 Route::post('/reservasi', [App\Http\Controllers\FrontReservation::class, 'form_submit'])->name('reservasi.form');
-Route::get('/reservasi/get_coupon/{wahana_id}/{code}', [App\Http\Controllers\FrontReservation::class, 'get_coupon'])->name('reservasi.coupon');
+Route::get('/reservasi/get_coupon/{wahana_id}/{validfor}/{code}', [App\Http\Controllers\FrontReservation::class, 'get_coupon'])->name('reservasi.coupon');
 Route::post('/reservasi/check_availability', [App\Http\Controllers\FrontReservation::class, 'check_availability'])->name('reservasi.check_availability');
 Route::post('/reservasi/store', [App\Http\Controllers\FrontReservation::class, 'store'])->name('reservasi.submit');
 Route::get('/reservasi/tiket/{id}', [App\Http\Controllers\FrontReservation::class, 'ticket'])->name('front_ticket');

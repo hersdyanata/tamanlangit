@@ -120,8 +120,8 @@ class FrontReservation extends Controller
         return $reservation->check_availability($request->all());
     }
 
-    public function get_coupon(Reservation $reservation, $wahana_id, $code){
-        return $reservation->checkCoupon($wahana_id, $code);
+    public function get_coupon(Reservation $reservation, $wahana_id, $validFor, $code){
+        return $reservation->checkCoupon($wahana_id, $validFor, $code);
     }
 
     public function ticket($id)

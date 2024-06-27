@@ -389,22 +389,30 @@
         }
 
         function getCoupon(code){
+            // console.log(code);
+
             $.ajax({
                 type: "GET",
-                url: "{{ route('reservasi.coupon', [$data->id, ':code']) }}".replace(':code', code),
+                url: "{{ route('reservasi.coupon', [$data->id, 'online', ':code']) }}".replace(':code', code),
                 success: function (s) {
                     if(s.isActive == false){
                         sw_error(s);
                     }else{
                         sw_success(s);
-                        displayDivDiscount.innerHTML = '<div class="row mil-mb-15">\
-                                                            <div class="col-md-6">\
-                                                                <h3>Diskon</h3>\
-                                                            </div>\
-                                                            <div class="col-md-6" style="text-align: end;">\
-                                                                <h3 id="display_discount"></h3>\
-                                                            </div>\
-                                                        </div>';
+                        let textDiscount;
+                        if(s.coupon.discount_type == 'persentase'){
+                            textDiscount = '(' + s.coupon.discount + '%)';
+                        }else{
+                            textDiscount = '(' + formatCurrency(s.coupon.discount) + ')';
+                        }
+                        displayDivDiscount.innerHTML = `<div class="row mil-mb-15">
+                                                            <div class="col-md-6">
+                                                                <h3>Diskon ${textDiscount}</h3>
+                                                            </div>
+                                                            <div class="col-md-6" style="text-align: end;">
+                                                                <h3 id="display_discount"></h3>
+                                                            </div>
+                                                        </div>`;
                         calculateDiscount(s.coupon);
                     }
                 },
@@ -419,7 +427,7 @@
         function calculateDiscount(coupon){
             let displayDiscount = document.getElementById('display_discount');
             let discountAmount;
-            if(coupon.discount_type == 'percentage'){
+            if(coupon.discount_type == 'persentase'){
                 discountAmount = parseInt(inputTotalAmount.value) * parseInt(coupon.discount) / 100;
             }else{
                 discountAmount = parseInt(coupon.discount);
